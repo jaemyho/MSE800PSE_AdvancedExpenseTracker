@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Report</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>user</th>
+        <th>Category</th>
+        <th>Vendor</th>
+        <th>Description</th>
+        <th>Currency</th>
+        <th>Amount</th>
+        <th>Date</th>
+        <th>Bank</th>
+        <th>Actions</th>
+    </tr>
+    {% for expense in expenses %}
+    <tr>
+        <td>{{ expense.id }}</td>
+        <td>{{ expense.user_id }}</td>
+        <td>{{ expense.category_id }}</td>
+        <td>{{ expense.vendor }}</td>
+        <td>{{ expense.description }}</td>
+        <td>{{ expense.currency_id }}</td>
+        <td>{{ expense.amount }}</td>
+        <td>{{ expense.date }}</td>
+        <td>{{ expense.bank_statement }}</td>
+        <td>
+            <a href="">Edit</a> |
+            <a href="">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

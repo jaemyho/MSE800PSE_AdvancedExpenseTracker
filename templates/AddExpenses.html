@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Expenses Form</title>
+</head>
+<body>
+    <h2>Add Expenses</h2>
+
+    <form action="/submit" method="POST">
+        <!-- Company Input -->
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company" placeholder="Enter Company" required><br><br>
+
+        <!-- Category Input -->
+        <label for="category">Category:</label>
+        <input type="text" id="category" name="category" placeholder="Enter Category" required><br><br>
+
+        <!-- Description Input -->
+        <label for="description" style="display: block; margin-bottom: 5px;">Description:</label>
+        <textarea id="description" name="description" placeholder="Enter Description" required style="height: 100px; width: 400px;"></textarea><br><br>
+
+        <!-- Amount Input -->
+        <label for="amount">Amount:</label>
+        <!-- Dropdown currencyy -->
+        <select id="currency" name="currency" required>
+            <option value="NZD">NZD</option>
+            <option value="USD">USD</option>
+            <option value="AUD">AUD</option>
+        </select>
+        <!-- Amount numeric -->
+        <input type="number" id="amount" name="amount" placeholder="Enter Amount" required><br><br>
+
+        <!-- Expense Date -->
+        <label for="expense_date">Date:</label>
+        <input type="date" id="expense_date" name="expense_date" placeholder="Enter Date" required><br><br>
+
+        <!-- Submit Button -->
+        <input type="submit" value="Submit">
+    </form>
+
+</body>
+</html>

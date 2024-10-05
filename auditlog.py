@@ -1,18 +1,12 @@
 import re
 import datetime
-import configparser
-from database import Database
 from sql_statement import *
+from flask_mysqldb import MySQL
+import MySQLdb
 
-db = Database()
 class auditlog():
-    def __init__(self):
-        self.type = ""
-        self.table = ""
-        self.date = datetime.datetime.now()
-        self.funct = ""
-        self.user = ""
-        self.script = ""
+    def __init__(self, app):
+        self.mysql = MySQL(app)
 
     def __get_script_type__(self,sql):
         #return the sql statement type
@@ -44,9 +38,10 @@ class auditlog():
         table = self.__get_script_table__(script)
         current_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
-            cursor = db.create_connection_parser()
+            cur = self.mysql.connection.cursor()
             values = (type, user, current_date, funct, table, script)
-            cursor.execute(ADD_AUDITLOG, values)
-        except configparser.Error as e:
+            cur.execute(ADD_AUDITLOG, values)
+            self.mysql.connection.commit()
+            cur.close()
+        except MySQLdb.Error as e:
             print(f"Audit Log Class - add_auditlog Error: {e}")
-
