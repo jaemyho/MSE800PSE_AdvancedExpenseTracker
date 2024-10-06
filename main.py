@@ -21,6 +21,10 @@ def index():
 def add_expense():
     return expense_controller.add_expense()
 
+@app.route('/expenses/scan_file', methods=['GET', 'POST'])
+def upload_file():
+    return expense_controller.get_receipt_total()
+
 @app.route('/report')
 def report():
     return expense_controller.view_expense()

@@ -28,4 +28,7 @@ class ExpenseController:
         return render_template('index.html')
         #return render_template('report.html', expenses=expenses)
 
-    #
+    def get_receipt_total(self):
+        return render_template('upload_file.html')
+        # receipt_total = self.expenses_model.scan_receipt()
+        # return receipt_total
