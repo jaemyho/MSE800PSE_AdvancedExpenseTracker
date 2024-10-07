@@ -1,5 +1,6 @@
 #Testing MVC Flask
 from flask import Flask
+from flask_mysqldb import MySQL
 from config import Config
 from controllers.expenses_controller import ExpenseController
 from controllers.database_controller import DatabaseController
@@ -8,11 +9,11 @@ app = Flask(__name__, template_folder='views')  # Change the template folder to 
 
 # Configure MySQL
 app.config.from_object(Config)
-app.app_context().push()
+mysql = MySQL(app)
 
 # Initialize the Controllers
-expense_controller = ExpenseController(app)
-database_controller = DatabaseController(app)
+expense_controller = ExpenseController(mysql)
+database_controller = DatabaseController(mysql)
 # Routes
 @app.route('/')
 def index():
@@ -32,5 +33,6 @@ def report():
 # Run the application
 if __name__ == '__main__':
     # Check the database connection and table before starting the app
-    database_controller.check_database_and_table()
+    with app.app_context():
+        database_controller.check_database_and_table()
     app.run(debug=True)

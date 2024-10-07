@@ -4,9 +4,9 @@ from auditlog import auditlog
 import datetime
 
 class ExpensesModel:
-    def __init__(self, app):
-        self.mysql = MySQL(app)
-        self.auditlog = auditlog(app)
+    def __init__(self, mysql):
+        self.mysql = mysql
+        self.auditlog = auditlog(mysql)
 
     def add_expense(self,vendor, category, description, currency, amount, inp_date):
         try:

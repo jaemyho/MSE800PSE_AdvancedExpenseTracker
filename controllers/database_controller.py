@@ -3,8 +3,8 @@ from models.database_model import DatabaseModel
 from sql_statement import *
 import MySQLdb
 class DatabaseController:
-    def __init__(self, app):
-        self.database_model = DatabaseModel(app)
+    def __init__(self, mysql):
+        self.database_model = DatabaseModel(mysql)
 
     def check_database_and_table(self):
         """Check if the database connection works and if the 'users' table exists."""

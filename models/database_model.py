@@ -2,8 +2,8 @@ from flask_mysqldb import MySQL
 import MySQLdb
 
 class DatabaseModel:
-    def __init__(self, app):
-        self.mysql = MySQL(app)
+    def __init__(self, mysql):
+        self.mysql = mysql
 
     def check_table_exists(self, table_name):
         try:

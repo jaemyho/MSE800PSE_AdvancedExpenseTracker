@@ -5,8 +5,8 @@ from flask_mysqldb import MySQL
 import MySQLdb
 
 class auditlog():
-    def __init__(self, app):
-        self.mysql = MySQL(app)
+    def __init__(self, mysql):
+        self.mysql = mysql
 
     def __get_script_type__(self,sql):
         #return the sql statement type
