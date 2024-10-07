@@ -12,7 +12,7 @@ app.config.from_object(Config)
 mysql = MySQL(app)
 
 # Initialize the Controllers
-expense_controller = ExpenseController(mysql)
+expense_controller = ExpenseController(mysql,app)
 database_controller = DatabaseController(mysql)
 # Routes
 @app.route('/')
@@ -24,7 +24,7 @@ def add_expense():
 
 @app.route('/expenses/scan_file', methods=['GET', 'POST'])
 def upload_file():
-    return expense_controller.get_receipt_total()
+    return expense_controller.get_receipt_data()
 
 @app.route('/report')
 def report():

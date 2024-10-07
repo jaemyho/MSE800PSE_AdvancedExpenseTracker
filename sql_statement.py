@@ -38,8 +38,7 @@ GET_ALL_EXPENSES = f"SELECT * FROM {EXPENSE_TABLE};"
 
 #INSERT SCRIPT
 ADD_AUDITLOG = f"INSERT INTO {AUDITLOG_TABLE} (type, user, insert_date, function_name, table_name, sql_statement) VALUES (%s, %s, %s, %s, %s, %s)"
-ADD_SINGLE_EXPENSE = f"INSERT INTO {EXPENSE_TABLE} (user_id, company_id, category_id, vendor, description, currency_id, amount, date, insert_date) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
+ADD_SINGLE_EXPENSE = f"INSERT INTO {EXPENSE_TABLE} (user_id, company_id, category_id, vendor, description, currency_id, amount, date, insert_date,receipt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
 #UPDATE SCRIPT
 

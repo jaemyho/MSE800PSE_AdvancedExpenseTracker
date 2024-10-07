@@ -7,3 +7,6 @@ class Config:
     MYSQL_CONNECT_TIMEOUT = 28800  # Increase the connect timeout (in seconds)
     MYSQL_WAIT_TIMEOUT = 28800  # Increase the wait timeout (in seconds)
     MYSQL_INTERACTIVE_TIMEOUT = 28800  # Interactive timeout (in seconds)
+
+    # Upload folder configuration
+    UPLOAD_FOLDER = 'uploads/'
