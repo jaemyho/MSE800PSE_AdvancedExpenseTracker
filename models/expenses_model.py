@@ -35,13 +35,23 @@ class ExpensesModel:
         try:
             values = (vendor, category, description, currency, amount, inp_date, expense_id)
             cur = self.mysql.connection.cursor()
-            cur.execute(UPDATE_SINGLE_EXPENSE, values)
+            cur.execute(UPDATE_SINGLE_EXPENSE_BY_ID, values)
             self.mysql.connection.commit()
             cur.close()
-            self.auditlog.add_auditlog("update_expense", "User", UPDATE_SINGLE_EXPENSE % values)  # dummy data
+            self.auditlog.add_auditlog("update_expense", "User", UPDATE_SINGLE_EXPENSE_BY_ID % values)  # dummy data
         except Exception as e:
             print(f"Expenses Update Expense Error : {e}")
 
+    def delete_expense(self, expense_id,expense_details):
+        try:
+            values = (expense_id,)
+            cur = self.mysql.connection.cursor()
+            cur.execute(DELETE_SINGLE_EXPENSE_BY_ID, values)
+            self.mysql.connection.commit()
+            cur.close()
+            self.auditlog.add_auditlog("delete_expense", "User", DELETE_SINGLE_EXPENSE_BY_ID % values + str(expense_details))  # dummy data
+        except Exception as e:
+            print(f"Expenses Delete Expense Error : {e}")
 
     def get_all_expense(self):
         try:

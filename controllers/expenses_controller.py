@@ -38,7 +38,12 @@ class ExpenseController:
             return redirect(url_for('report'))
         return render_template('expense.html', title='Edit Expense',expense=expense)
 
-
+    def delete_expense(self, expense_id):
+        expense = self.expenses_model.get_expense_by_id(expense_id)
+        if request.method == 'POST':
+            self.expenses_model.delete_expense(expense_id,expense)
+            return redirect(url_for('report'))
+        return render_template('expense.html', title='Delete Expense', expense=expense)
     def view_expense(self):
         expenses = self.expenses_model.get_all_expense()
         return render_template('report.html', expenses=expenses)

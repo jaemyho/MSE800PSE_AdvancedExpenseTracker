@@ -28,7 +28,7 @@ def edit_expense(expense_id):
 
 @app.route('/delete_expense/<int:expense_id>', methods=['GET', 'POST'])
 def delete_expense(expense_id):
-    return expense_controller.edit_expense(expense_id)
+    return expense_controller.delete_expense(expense_id)
 
 @app.route('/expenses/scan_file', methods=['GET', 'POST'])
 def upload_file():
