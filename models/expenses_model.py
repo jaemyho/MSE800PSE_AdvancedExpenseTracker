@@ -1,6 +1,4 @@
 import os
-
-from flask_mysqldb import MySQL
 from sql_statement import *
 from auditlog import auditlog
 import datetime
@@ -33,6 +31,18 @@ class ExpensesModel:
         except Exception as e:
             print(f"Expenses Add Expense Error : {e}")
 
+    def update_expense(self, expense_id, vendor, category, description, currency, amount, inp_date):
+        try:
+            values = (vendor, category, description, currency, amount, inp_date, expense_id)
+            cur = self.mysql.connection.cursor()
+            cur.execute(UPDATE_SINGLE_EXPENSE, values)
+            self.mysql.connection.commit()
+            cur.close()
+            self.auditlog.add_auditlog("update_expense", "User", UPDATE_SINGLE_EXPENSE % values)  # dummy data
+        except Exception as e:
+            print(f"Expenses Update Expense Error : {e}")
+
+
     def get_all_expense(self):
         try:
             cur = self.mysql.connection.cursor()
@@ -43,4 +53,17 @@ class ExpensesModel:
             return expenses
         except Exception as e:
             print(f"Get All Expense Error : {e}")
+            return ()
+
+    def get_expense_by_id(self,expense_id):
+        try:
+            cur = self.mysql.connection.cursor()
+            values = (expense_id,)
+            cur.execute(GET_EXPENSE_BY_ID, values)
+            self.mysql.connection.commit()
+            expense = cur.fetchone()
+            cur.close()
+            return expense
+        except Exception as e:
+            print(f"Get Expense by Id Error : {e}")
             return ()

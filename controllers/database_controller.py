@@ -1,4 +1,3 @@
-from flask import render_template, request, redirect, url_for
 from models.database_model import DatabaseModel
 from sql_statement import *
 import MySQLdb

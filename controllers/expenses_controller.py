@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for
 from models.expenses_model import ExpensesModel
 from file_upload_handler import FileUploadHandler
 from receipt_reader import ReceiptReader
-import datetime
+
 class ExpenseController:
     def __init__(self, mysql,app):
         self.app = app
@@ -23,7 +23,21 @@ class ExpenseController:
             receipt = 0
             self.expenses_model.add_expense(vendor, category, description, currency, amount, date,receipt)
             return redirect(url_for('add_expense'))  # Redirect to the add user page after successful submission
-        return render_template('add_expense.html')
+        return render_template('expense.html', title='Add Expense', expense="")
+
+    def edit_expense(self, expense_id):
+        expense = self.expenses_model.get_expense_by_id(expense_id)
+        if request.method == 'POST':
+            vendor = request.form['vendor']
+            category = request.form['category']
+            description = request.form['description']
+            currency = request.form['currency']
+            amount = request.form['amount']
+            date = request.form['expense_date']
+            self.expenses_model.update_expense(expense_id, vendor, category, description, currency, amount, date)
+            return redirect(url_for('report'))
+        return render_template('expense.html', title='Edit Expense',expense=expense)
+
 
     def view_expense(self):
         expenses = self.expenses_model.get_all_expense()

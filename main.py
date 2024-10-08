@@ -22,6 +22,14 @@ def index():
 def add_expense():
     return expense_controller.add_expense()
 
+@app.route('/edit_expense/<int:expense_id>', methods=['GET', 'POST'])
+def edit_expense(expense_id):
+    return expense_controller.edit_expense(expense_id)
+
+@app.route('/delete_expense/<int:expense_id>', methods=['GET', 'POST'])
+def delete_expense(expense_id):
+    return expense_controller.edit_expense(expense_id)
+
 @app.route('/expenses/scan_file', methods=['GET', 'POST'])
 def upload_file():
     return expense_controller.get_receipt_data()

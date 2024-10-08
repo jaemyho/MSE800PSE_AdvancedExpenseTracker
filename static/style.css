@@ -1,0 +1,278 @@
+
+/* General styling for header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+}
+
+/* Align the right section */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 100px; /* Spacing between "Log out" and bell icon */
+}
+
+/* Style for the links */
+.header-right a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+}
+
+
+/* Adjust the size of the SVG icon */
+.size-6 {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    cursor: pointer;
+}
+
+/* Optional: Add hover effect to log out and bell icon */
+.header-right a:hover {
+    opacity: 0.8;
+}
+
+/* Reset some default styles */
+body, h1, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Container for layout */
+.container {
+    display: flex;
+    width: 100%;
+}
+
+/* Sidebar styles */
+.sidebar {
+    width: 200px;
+    background-color: #333;
+    padding-top: 20px;
+    position: fixed;
+    top: 77px; /* Offset for the header */
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+.sidebar ul {
+    list-style-type: none;
+}
+
+.sidebar ul li {
+    margin: 15px 0;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+    text-align: left;
+    font-size: 18px;
+}
+
+.sidebar ul li a:hover {
+    background-color: #575757;
+}
+
+/* Main content styles */
+.content {
+    margin-left: 220px; /* Leave space for the sidebar */
+    padding: 20px;
+    width: calc(100% - 220px);
+    margin-top: 60px; /* Offset for the header */
+    background-color: white;
+    min-height: 100vh;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+/* General form styling */
+/* General form styling */
+form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* Form header styling */
+form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Labels for the inputs */
+form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Input field styling */
+form input[type="text"],
+form input[type="number"],
+form input[type="date"],
+form textarea,
+form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+/* Focus state for inputs */
+form input[type="text"]:focus,
+form input[type="number"]:focus,
+form input[type="date"]:focus,
+form textarea:focus,
+form select:focus {
+    border-color: #4CAF50;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    outline: none;
+}
+
+/* Textarea-specific styling */
+form textarea {
+    height: 120px;
+    resize: vertical; /* Allow resizing only vertically */
+}
+
+/* Styling for the submit button */
+/* Styling for input[type="submit"] button in dark theme */
+input[type="submit"] {
+    background: linear-gradient(135deg, #333, #444);
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover effect for input[type="submit"] button */
+input[type="submit"]:hover {
+    background: linear-gradient(135deg, #444, #555);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Active state for input[type="submit"] button */
+input[type="submit"]:active {
+    background: linear-gradient(135deg, #555, #666);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(2px);
+}
+
+/* Focus state for input[type="submit"] button */
+input[type="submit"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(100, 100, 100, 0.4);
+}
+
+/* Styling the vendor and category input fields next to each other */
+.form-row {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.form-row input[type="text"] {
+    flex: 1;
+}
+
+/* Style for the notification bell icon */
+.bell-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    position: fixed;
+    top: 0%;
+    right: 0%;
+    width: 30px;
+    height: 30px;
+    background-color: #333;
+    padding: 20px;
+    border-radius: 50%;
+}
+
+.bell-icon svg {
+    position: absolute;
+    stroke: #fff;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    transform: translate(-50%,-50%);
+    animation: shake 1s linear infinite;
+    transform-origin: 50% 0;
+}
+@keyframes shake {
+    0%{
+        transform:translate(-50%,-50%) rotate(0deg);
+    }
+    25%{
+        transform:translate(-50%,-50%) rotate(-10deg);
+    }
+    50%{
+        transform:translate(-50%,-50%) rotate(0deg);
+    }
+    100%{
+        transform:translate(-50%,-50%) rotate(10deg);
+    }
+}

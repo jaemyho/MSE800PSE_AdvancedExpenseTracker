@@ -1,7 +1,6 @@
 import re
 import datetime
 from sql_statement import *
-from flask_mysqldb import MySQL
 import MySQLdb
 
 class auditlog():

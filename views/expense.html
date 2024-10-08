@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<form action="{% if title == 'Add Expense' %}
+{{ url_for('add_expense') }}
+{% elif title == 'Edit Expense' %}
+{{ url_for('edit_expense', expense_id=expense.id) }}
+{% else %}{{ url_for('add_expense') }}
+{% endif %}" method="POST">
+    <!-- Company Input -->
+    <label for="vendor">Vendor:</label>
+    <input type="text" id="vendor" name="vendor" placeholder="Enter Vendor" value="{{ expense.vendor if expense and expense.vendor else '' }}" required ><br><br>
+
+    <!-- Category Input -->
+    <label for="category">Category:</label>
+    <input type="text" id="category" name="category" placeholder="Enter Category" value="{{ expense.category_id if expense and expense.category_id else '' }}" required><br><br>
+
+    <!-- Description Input -->
+    <label for="description" style="display: block; margin-bottom: 5px;">Description:</label>
+    <textarea id="description" name="description" placeholder="Enter Description"  required style="height: 100px; width: 400px;" >{{ expense.description if expense and expense.description else '' }}</textarea><br><br>
+
+    <!-- Amount Input -->
+    <label for="amount">Amount:</label>
+    <!-- Dropdown currencyy -->
+    <select id="currency" name="currency" required>
+        <option value="NZD">NZD</option>
+        <option value="USD">USD</option>
+        <option value="AUD">AUD</option>
+    </select>
+    <!-- Amount numeric -->
+    <input type="number" id="amount" name="amount" placeholder="Enter Amount" value="{{ expense.amount if expense and expense.amount else '' }}" required><br><br>
+
+    <!-- Expense Date -->
+    <label for="expense_date">Date:</label>
+    <input type="date" id="expense_date" name="expense_date" placeholder="Enter Date" value="{{ expense.date if expense and expense.date else '' }}" required><br><br>
+
+    <!-- Submit Button -->
+    <input type="submit" value="{{ title }}">
+</form>
+{% endblock %}
