@@ -187,8 +187,15 @@ form textarea {
     resize: vertical; /* Allow resizing only vertically */
 }
 
+/* Container for buttons to align them side by side */
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Distribute buttons with space between them */
+    gap: 20px; /* Adds space between buttons */
+    margin-top: 20px;
+}
+
 /* Styling for the submit button */
-/* Styling for input[type="submit"] button in dark theme */
 input[type="submit"] {
     background: linear-gradient(135deg, #333, #444);
     color: #fff;
@@ -220,6 +227,45 @@ input[type="submit"]:active {
 
 /* Focus state for input[type="submit"] button */
 input[type="submit"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(100, 100, 100, 0.4);
+}
+
+/* Styling for the back button */
+a.back-button {
+    background: linear-gradient(135deg, #333, #444);
+    color: #fff;
+    padding: 10px 0px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    text-align: center;
+}
+
+/* Hover effect for back button */
+a.back-button:hover {
+    background: linear-gradient(135deg, #444, #555);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Active state for back button */
+a.back-button:active {
+    background: linear-gradient(135deg, #555, #666);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(2px);
+}
+
+/* Focus state for back button */
+a.back-button:focus {
     outline: none;
     box-shadow: 0 0 0 4px rgba(100, 100, 100, 0.4);
 }
