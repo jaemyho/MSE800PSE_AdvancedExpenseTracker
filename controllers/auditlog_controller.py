@@ -9,9 +9,7 @@ class AuditlogController:
 
     def view_auditlog(self):
         sql = GET_ALL_AUDITLOG
-        type = ""
-        start_date = ""
-        end_date = ""
+        type, start_date, end_date = "", "", ""
         if request.method == 'POST':
             type = request.form['search_type']
             start_date = request.form['search_start']

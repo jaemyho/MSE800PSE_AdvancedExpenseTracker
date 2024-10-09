@@ -54,10 +54,10 @@ class ExpensesModel:
         except Exception as e:
             print(f"Expenses Delete Expense Error : {e}")
 
-    def get_all_expense(self):
+    def get_all_expense(self,mysql_script = GET_ALL_EXPENSES):
         try:
             cur = self.mysql.connection.cursor()
-            cur.execute(GET_ALL_EXPENSES)
+            cur.execute(mysql_script)
             self.mysql.connection.commit()
             expenses = cur.fetchall()
             cur.close()

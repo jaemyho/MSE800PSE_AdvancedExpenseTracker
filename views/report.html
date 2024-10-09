@@ -2,6 +2,29 @@
 
 {% block content %}
 <h2>Report</h2>
+<form action ="{{ url_for('report') }}" method="POST">
+    <div style="font-size:18px; display: flex; gap: 20px;">
+        <!--Type-->
+        <label for="search_type">Type:</label>
+        <select id="search_type" name="search_type"  required>
+            <option value="all" {% if search_type == 'all' %}selected{% endif %} >All</option>
+            <option value="weekly" {% if search_type == 'weekly' %}selected{% endif %} >Weekly</option>
+            <option value="monthly" {% if search_type == 'monthly' %}selected{% endif %} >Monthly</option>
+            <option value="annually" {% if search_type == 'annually' %}selected{% endif %} >Annually</option>
+        </select>
+
+        <!--Start Date-->
+        <label for="search_start">Start Date:</label>
+        <input type="date" id="search_start" name="search_start" placeholder="Enter Start Date" value="{{ search_start if search_start else '' }}">
+
+        <!--End Date-->
+        <label for="search_end">End Date:</label>
+        <input type="date" id="search_end" name="search_end" placeholder="Enter End Date" value="{{ search_end if search_end else '' }}">
+
+        <!--Submit-->
+        <input type="submit" value="Search">
+    </div>
+</form>
 <table>
     <tr>
         <th>ID</th>

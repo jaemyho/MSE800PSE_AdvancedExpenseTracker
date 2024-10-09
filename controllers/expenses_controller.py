@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for
 from models.expenses_model import ExpensesModel
 from file_upload_handler import FileUploadHandler
 from receipt_reader import ReceiptReader
+from sql_statement import *
 
 class ExpenseController:
     def __init__(self, mysql,app):
@@ -44,9 +45,32 @@ class ExpenseController:
             self.expenses_model.delete_expense(expense_id,expense)
             return redirect(url_for('report'))
         return render_template('expense.html', title='Delete Expense', expense=expense)
+
     def view_expense(self):
-        expenses = self.expenses_model.get_all_expense()
-        return render_template('report.html', expenses=expenses)
+        sql = GET_ALL_EXPENSES
+        type, start_date, end_date = "", "", ""
+        if request.method == 'POST':
+            type = request.form['search_type']
+            start_date = request.form['search_start']
+            end_date = request.form['search_end']
+
+            sql = sql[:-1]  # removing character ";" at the end
+            sql += " WHERE 1=1"
+
+            if type == "weekly":
+                sql += " AND YEARWEEK(date) = YEARWEEK(CURRENT_DATE())"
+            elif type == "monthly":
+                sql += " AND MONTH(date) = MONTH(CURRENT_DATE())"
+            elif type == "annually":
+                sql += " AND YEAR(date) = YEAR(CURRENT_DATE())"
+            if start_date != "":
+                sql += " AND date >= '" + start_date + "'"
+            if end_date != "":
+                sql += " AND date <= '" + end_date + "'"
+
+            sql += ";"
+        expenses = self.expenses_model.get_all_expense(sql)
+        return render_template('report.html', expenses=expenses, search_type=type, search_start=start_date, search_end=end_date)
 
     def get_receipt_data(self):
         if request.method == 'POST':

@@ -37,7 +37,7 @@ def delete_expense(expense_id):
 def upload_file():
     return expense_controller.get_receipt_data()
 
-@app.route('/report')
+@app.route('/report', methods=['GET', 'POST'])
 def report():
     return expense_controller.view_expense()
 

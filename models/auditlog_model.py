@@ -45,7 +45,7 @@ class AuditlogModel:
         except MySQLdb.Error as e:
             print(f"Audit Log Class - add_auditlog Error: {e}")
 
-    def get_all_auditlog(self, mysql_script):
+    def get_all_auditlog(self, mysql_script= GET_ALL_AUDITLOG):
         try:
             cur = self.mysql.connection.cursor()
             cur.execute(mysql_script)
