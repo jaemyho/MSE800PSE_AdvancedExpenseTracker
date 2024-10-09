@@ -23,9 +23,25 @@ CREATE TABLE IF NOT EXISTS `AET_expense` (
   `bank_statement` TINYINT NOT NULL DEFAULT 0,
   `date` DATE NOT NULL,
   `insert_date` DATETIME NOT NULL,
-  PRIMARY KEY (`id`));
+   `receipt`  TINYINT(4) DEFAULT 0 NOT NULL ,
+    PRIMARY KEY (`id`));
 """
 
+CREATE_BANK_STATEMENT_TABLE = """
+CREATE TABLE IF NOT EXISTS `AET_bank_statement_info` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `company_id` INT NOT NULL,
+  `bank_name` VARCHAR(45) NULL,
+  `customer_first_name` VARCHAR(45) NULL,
+  `customer_last_name` VARCHAR(45) NULL,
+  `currency` INT NOT NULL,
+  `expenditure_amount` FLOAT NOT NULL,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE NOT NULL,
+  `insert_date` DATETIME NOT NULL,
+  PRIMARY KEY (`id`));
+"""
 
 CREATE_DB = "CREATE DATABASE IF NOT EXISTS"
 DEFAULT_DB_NAME = "JaemyWeb"
