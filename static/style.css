@@ -321,3 +321,8 @@ a.back-button:focus {
         transform:translate(-50%,-50%) rotate(10deg);
     }
 }
+/*#expenseChart {
+        width: 70% !important;
+        height: 200px !important;
+        max-width: 100%;
+    }*/

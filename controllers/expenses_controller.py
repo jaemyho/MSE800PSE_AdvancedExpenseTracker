@@ -3,6 +3,7 @@ from models.expenses_model import ExpensesModel
 from file_upload_handler import FileUploadHandler
 from receipt_reader import ReceiptReader
 from sql_statement import *
+import pandas as pd
 
 class ExpenseController:
     def __init__(self, mysql,app):
@@ -48,7 +49,7 @@ class ExpenseController:
 
     def view_expense(self):
         sql = GET_ALL_EXPENSES
-        type, start_date, end_date = "", "", ""
+        type, start_date, end_date, grouped_dict_category = "", "", "", {}
         if request.method == 'POST':
             type = request.form['search_type']
             start_date = request.form['search_start']
@@ -70,7 +71,17 @@ class ExpenseController:
 
             sql += ";"
         expenses = self.expenses_model.get_all_expense(sql)
-        return render_template('report.html', expenses=expenses, search_type=type, search_start=start_date, search_end=end_date)
+        print(expenses)
+
+        if(expenses != ()):
+            # Creating a DataFrame
+            df = pd.DataFrame(expenses)
+
+            # Grouping by category_id and summing the amount
+            grouped_category = df.groupby('category_id')['amount'].sum().reset_index()
+            grouped_dict_category = grouped_category.to_dict(orient='records')
+
+        return render_template('report.html', expenses=expenses, search_type=type, search_start=start_date, search_end=end_date, grouped_category=grouped_dict_category)
 
     def get_receipt_data(self):
         if request.method == 'POST':
