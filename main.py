@@ -4,6 +4,7 @@ from flask_mysqldb import MySQL
 from config import Config
 from controllers.expenses_controller import ExpenseController
 from controllers.database_controller import DatabaseController
+from controllers.auditlog_controller import AuditlogController
 
 app = Flask(__name__, template_folder='views')  # Change the template folder to 'views'
 
@@ -14,6 +15,8 @@ mysql = MySQL(app)
 # Initialize the Controllers
 expense_controller = ExpenseController(mysql,app)
 database_controller = DatabaseController(mysql)
+auditlog_controller = AuditlogController(mysql)
+
 # Routes
 @app.route('/')
 def index():
@@ -37,6 +40,10 @@ def upload_file():
 @app.route('/report')
 def report():
     return expense_controller.view_expense()
+
+@app.route('/auditlogreport', methods=['GET', 'POST'])
+def auditlogreport():
+    return auditlog_controller.view_auditlog()
 
 # Run the application
 if __name__ == '__main__':

@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `AET_auditlog` (
   `function_name` VARCHAR(45) NOT NULL,
   `table_name` VARCHAR(45) NOT NULL,
   `sql_statement` VARCHAR(300) NOT NULL,
+  `record` VARCHAR(300) NULL AFTER `sql_statement`,
   PRIMARY KEY (`id`));
 """
 
@@ -52,10 +53,11 @@ USER_TABLE = "AET_Users"
 #SELECT SCRIPT
 GET_ALL_EXPENSES = f"SELECT * FROM {EXPENSE_TABLE};"
 GET_EXPENSE_BY_ID = f"SELECT * FROM {EXPENSE_TABLE} WHERE id = %s;"
+GET_ALL_AUDITLOG = f"SELECT * FROM {AUDITLOG_TABLE};"
 
 #INSERT SCRIPT
-ADD_AUDITLOG = f"INSERT INTO {AUDITLOG_TABLE} (type, user, insert_date, function_name, table_name, sql_statement) VALUES (%s, %s, %s, %s, %s, %s)"
-ADD_SINGLE_EXPENSE = f"INSERT INTO {EXPENSE_TABLE} (user_id, company_id, category_id, vendor, description, currency_id, amount, date, insert_date,receipt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+ADD_AUDITLOG = f"INSERT INTO {AUDITLOG_TABLE} (type, user, insert_date, function_name, table_name, sql_statement, record) VALUES (%s, %s, %s, %s, %s, %s, %s);"
+ADD_SINGLE_EXPENSE = f"INSERT INTO {EXPENSE_TABLE} (user_id, company_id, category_id, vendor, description, currency_id, amount, date, insert_date,receipt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
 
 #UPDATE SCRIPT
 UPDATE_SINGLE_EXPENSE_BY_ID = f"UPDATE {EXPENSE_TABLE} SET vendor = %s, category_id = %s, description = %s, currency_id = %s, amount = %s, date = %s WHERE id = %s;"

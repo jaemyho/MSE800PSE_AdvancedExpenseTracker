@@ -122,8 +122,7 @@ th, td {
 }
 
 /* General form styling */
-/* General form styling */
-form {
+.expense form {
     max-width: 400px;
     margin: 40px auto;
     padding: 20px 30px;
@@ -135,7 +134,7 @@ form {
 }
 
 /* Form header styling */
-form h2 {
+.expense form h2 {
     text-align: center;
     margin-bottom: 20px;
     font-size: 24px;
@@ -144,7 +143,7 @@ form h2 {
 }
 
 /* Labels for the inputs */
-form label {
+.expense form label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
@@ -153,11 +152,11 @@ form label {
 }
 
 /* Input field styling */
-form input[type="text"],
-form input[type="number"],
-form input[type="date"],
-form textarea,
-form select {
+.expense form input[type="text"],
+.expense form input[type="number"],
+.expense form input[type="date"],
+.expense form textarea,
+.expense form select {
     width: 100%;
     padding: 12px;
     margin-bottom: 20px;
@@ -170,11 +169,11 @@ form select {
 }
 
 /* Focus state for inputs */
-form input[type="text"]:focus,
-form input[type="number"]:focus,
-form input[type="date"]:focus,
-form textarea:focus,
-form select:focus {
+.expense form input[type="text"]:focus,
+.expense form input[type="number"]:focus,
+.expense form input[type="date"]:focus,
+.expense form textarea:focus,
+.expense form select:focus {
     border-color: #4CAF50;
     background-color: #fff;
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
@@ -182,13 +181,13 @@ form select:focus {
 }
 
 /* Textarea-specific styling */
-form textarea {
+.expense form textarea {
     height: 120px;
     resize: vertical; /* Allow resizing only vertically */
 }
 
 /* Container for buttons to align them side by side */
-.button-container {
+.expense .button-container {
     display: flex;
     justify-content: space-between; /* Distribute buttons with space between them */
     gap: 20px; /* Adds space between buttons */
@@ -196,7 +195,7 @@ form textarea {
 }
 
 /* Styling for the submit button */
-input[type="submit"] {
+.expense input[type="submit"] {
     background: linear-gradient(135deg, #333, #444);
     color: #fff;
     padding: 12px 20px;
@@ -212,21 +211,21 @@ input[type="submit"] {
 }
 
 /* Hover effect for input[type="submit"] button */
-input[type="submit"]:hover {
+.expense input[type="submit"]:hover {
     background: linear-gradient(135deg, #444, #555);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     transform: translateY(-2px);
 }
 
 /* Active state for input[type="submit"] button */
-input[type="submit"]:active {
+.expense input[type="submit"]:active {
     background: linear-gradient(135deg, #555, #666);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     transform: translateY(2px);
 }
 
 /* Focus state for input[type="submit"] button */
-input[type="submit"]:focus {
+.expense input[type="submit"]:focus {
     outline: none;
     box-shadow: 0 0 0 4px rgba(100, 100, 100, 0.4);
 }

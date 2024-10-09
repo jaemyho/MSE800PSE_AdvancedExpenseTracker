@@ -1,12 +1,12 @@
 import os
 from sql_statement import *
-from auditlog import auditlog
+from models.auditlog_model import AuditlogModel
 import datetime
 
 class ExpensesModel:
     def __init__(self, mysql,app):
         self.mysql = mysql
-        self.auditlog = auditlog(mysql)
+        self.auditlog = AuditlogModel(mysql)
         self.upload_folder = app.config['UPLOAD_FOLDER']
         self.create_upload_folder()
 
@@ -27,18 +27,19 @@ class ExpensesModel:
             self.mysql.connection.commit()
             cur.close()
 
-            self.auditlog.add_auditlog("add_expense","User",ADD_SINGLE_EXPENSE % values) #dummy data
+            self.auditlog.add_auditlog("add_expense","User",ADD_SINGLE_EXPENSE % values, str(values)) #dummy data
         except Exception as e:
             print(f"Expenses Add Expense Error : {e}")
 
-    def update_expense(self, expense_id, vendor, category, description, currency, amount, inp_date):
+    def update_expense(self, expense_id, vendor, category, description, currency, amount, inp_date, previous_expense):
         try:
+            currency = 1 #dummy data replace with currency id
             values = (vendor, category, description, currency, amount, inp_date, expense_id)
             cur = self.mysql.connection.cursor()
             cur.execute(UPDATE_SINGLE_EXPENSE_BY_ID, values)
             self.mysql.connection.commit()
             cur.close()
-            self.auditlog.add_auditlog("update_expense", "User", UPDATE_SINGLE_EXPENSE_BY_ID % values)  # dummy data
+            self.auditlog.add_auditlog("update_expense", "User", UPDATE_SINGLE_EXPENSE_BY_ID % values, str(previous_expense))  # dummy data
         except Exception as e:
             print(f"Expenses Update Expense Error : {e}")
 
@@ -49,7 +50,7 @@ class ExpensesModel:
             cur.execute(DELETE_SINGLE_EXPENSE_BY_ID, values)
             self.mysql.connection.commit()
             cur.close()
-            self.auditlog.add_auditlog("delete_expense", "User", DELETE_SINGLE_EXPENSE_BY_ID % values + str(expense_details))  # dummy data
+            self.auditlog.add_auditlog("delete_expense", "User", DELETE_SINGLE_EXPENSE_BY_ID % values, str(expense_details))  # dummy data
         except Exception as e:
             print(f"Expenses Delete Expense Error : {e}")
 

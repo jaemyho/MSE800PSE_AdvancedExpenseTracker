@@ -34,7 +34,7 @@ class ExpenseController:
             currency = request.form['currency']
             amount = request.form['amount']
             date = request.form['expense_date']
-            self.expenses_model.update_expense(expense_id, vendor, category, description, currency, amount, date)
+            self.expenses_model.update_expense(expense_id, vendor, category, description, currency, amount, date, expense)
             return redirect(url_for('report'))
         return render_template('expense.html', title='Edit Expense',expense=expense)
 
