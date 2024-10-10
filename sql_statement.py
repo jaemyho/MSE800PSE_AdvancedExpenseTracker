@@ -36,19 +36,21 @@ CREATE TABLE IF NOT EXISTS `AET_bank_statement_info` (
   `bank_name` VARCHAR(45) NULL,
   `customer_first_name` VARCHAR(45) NULL,
   `customer_last_name` VARCHAR(45) NULL,
-  `currency` INT NOT NULL,
-  `expenditure_amount` FLOAT NOT NULL,
   `start_date` DATE NOT NULL,
   `end_date` DATE NOT NULL,
+  `currency` INT NOT NULL,
+  `expenditure_amount` FLOAT NOT NULL,
   `insert_date` DATETIME NOT NULL,
   PRIMARY KEY (`id`));
 """
+
 
 CREATE_DB = "CREATE DATABASE IF NOT EXISTS"
 DEFAULT_DB_NAME = "JaemyWeb"
 AUDITLOG_TABLE = "AET_auditlog"
 EXPENSE_TABLE = "AET_expense"
 USER_TABLE = "AET_Users"
+BANK_STATEMENT_TABLE = "AET_bank_statement_info"
 
 #SELECT SCRIPT
 GET_ALL_EXPENSES = f"SELECT * FROM {EXPENSE_TABLE};"
