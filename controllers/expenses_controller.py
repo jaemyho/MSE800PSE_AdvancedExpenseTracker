@@ -115,3 +115,36 @@ class ExpenseController:
 
             # Render the upload form for GET requests
         return render_template('upload_file.html')
+
+
+    def get_bank_statement_data(self):
+        if request.method == 'POST':
+            upload_handler = FileUploadHandler(request, self.app.config['UPLOAD_FOLDER'])
+            filepath, error = upload_handler.handle_upload()
+            if error:
+                return redirect(request.url)
+
+            # Create an instance of BankStatementReader
+            bank_reader = BankStatementReader(self.app.config['UPLOAD_FOLDER'])
+            # Extract text from the uploaded bank statement
+            bank_statement_data = bank_reader.extract_text_from_file(filepath)
+            parsed_data = bank_reader.parse_bank_statement(bank_statement_data)
+
+            # Logic to compare transactions with stored receipts in the database
+            matched_receipts = self.compare_transactions(parsed_data['transactions'])  # Implement this function
+
+            return render_template('results.html', parsed_data=parsed_data, matched_receipts=matched_receipts)
+
+
+    def compare_transactions(self,transactions):
+        """Implement logic to compare transactions with stored receipts."""
+
+        receipts = self.expenses_model.get_all_expense()  # Adjust this according to your method
+
+        matched_receipts = []
+        for transaction in transactions:
+            for receipt in receipts:
+                if transaction['amount'] == receipt['amount'] and transaction['description'] in receipt['description']:
+                    matched_receipts.append({'transaction': transaction, 'receipt': receipt})
+
+        return matched_receipts

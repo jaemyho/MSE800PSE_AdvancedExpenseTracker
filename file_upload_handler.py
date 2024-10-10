@@ -7,7 +7,7 @@ class FileUploadHandler:
     def __init__(self, request, upload_folder):
         self.request = request
         self.upload_folder = 'uploads/'
-        self.allowed_extensions = {'png', 'jpg', 'jpeg'}  # Allowed file extensions
+        self.allowed_extensions = {'png', 'jpg', 'jpeg', 'csv', 'pdf'}  # Allowed file extensions
 
     def allowed_file(self, filename):
         """Check if the uploaded file has an allowed extension."""
