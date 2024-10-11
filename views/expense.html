@@ -18,7 +18,13 @@
 
         <!-- Category Input -->
         <label for="category">Category:</label>
-        <input type="text" id="category" name="category" placeholder="Enter Category" value="{{ expense.category_id if expense and expense.category_id else '' }}" {% if title == 'Delete Expense' %}disabled{% endif %} required><br><br>
+        <!--input type="text" id="category" name="category" placeholder="Enter Category" value="{{ expense.category_id if expense and expense.category_id else '' }}" {% if title == 'Delete Expense' %}disabled{% endif %} required><br><br-->
+        <!-- Dropdown Category -->
+        <select id="category" name="category" {% if title == 'Delete Expense' %}disabled{% endif %} required>
+            {% for category in categories %}
+            <option value="{{category.id}}" {% if expense and expense.category_id == category.id %} selected {% endif %} >{{category.category}}</option>
+            {% endfor %}
+        </select><br><br>
 
         <!-- Description Input -->
         <label for="description" style="display: block; margin-bottom: 5px;">Description:</label>
@@ -28,16 +34,16 @@
         <label for="amount">Amount:</label>
         <!-- Dropdown currencyy -->
         <select id="currency" name="currency" {% if title == 'Delete Expense' %}disabled{% endif %} required>
-            <option value="NZD">NZD</option>
-            <option value="USD">USD</option>
-            <option value="AUD">AUD</option>
+            {% for currency in currencies %}
+            <option value="{{currency.id}}">{{currency.code}}</option>
+            {% endfor %}
         </select>
         <!-- Amount numeric -->
         <input type="number" id="amount" name="amount" placeholder="Enter Amount" value="{{ expense.amount if expense and expense.amount else '' }}" {% if title == 'Delete Expense' %}disabled{% endif %} required><br><br>
 
         <!-- Expense Date -->
         <label for="expense_date">Date:</label>
-        <input type="date" id="expense_date" name="expense_date" placeholder="Enter Date" value="{{ expense.date if expense and expense.date else '' }}" {% if title == 'Delete Expense' %}disabled{% endif %} required><br><br>
+        <input type="date" id="expense_date" name="expense_date" value="{{ expense.date if expense and expense.date else '' }}" {% if title == 'Delete Expense' %}disabled{% endif %} required><br><br>
 
         <div class="button-container">
             <!-- Submit Button -->

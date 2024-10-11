@@ -5,17 +5,23 @@ from receipt_reader import ReceiptReader
 from sql_statement import *
 import pandas as pd
 from bank_statement_reader import BankStatementReader
+from controllers.currency_controller import CurrencyController
+from controllers.category_controller import CategoryController
 
 class ExpenseController:
     def __init__(self, mysql,app):
         self.app = app
         self.expenses_model = ExpensesModel(mysql,app)
+        self.currency_controller = CurrencyController(mysql)
+        self.category_controller = CategoryController(mysql)
 
     #Home page
     def index(self):
         return render_template('index.html')
 
     def add_expense(self):
+        currencies = self.currency_controller.get_all_currencies()
+        categories = self.category_controller.get_all_categories()
         if request.method == 'POST':
             vendor = request.form['vendor']
             category = request.form['category']
@@ -26,10 +32,12 @@ class ExpenseController:
             receipt = 0
             self.expenses_model.add_expense(vendor, category, description, currency, amount, date,receipt)
             return redirect(url_for('add_expense'))  # Redirect to the add user page after successful submission
-        return render_template('expense.html', title='Add Expense', expense="")
+        return render_template('expense.html', title='Add Expense', expense="", currencies=currencies, categories=categories)
 
     def edit_expense(self, expense_id):
         expense = self.expenses_model.get_expense_by_id(expense_id)
+        currencies = self.currency_controller.get_all_currencies()
+        categories = self.category_controller.get_all_categories()
         if request.method == 'POST':
             vendor = request.form['vendor']
             category = request.form['category']
@@ -39,14 +47,16 @@ class ExpenseController:
             date = request.form['expense_date']
             self.expenses_model.update_expense(expense_id, vendor, category, description, currency, amount, date, expense)
             return redirect(url_for('report'))
-        return render_template('expense.html', title='Edit Expense',expense=expense)
+        return render_template('expense.html', title='Edit Expense',expense=expense, currencies=currencies, categories=categories)
 
     def delete_expense(self, expense_id):
         expense = self.expenses_model.get_expense_by_id(expense_id)
+        currencies = self.currency_controller.get_all_currencies()
+        categories = self.category_controller.get_all_categories()
         if request.method == 'POST':
             self.expenses_model.delete_expense(expense_id,expense)
             return redirect(url_for('report'))
-        return render_template('expense.html', title='Delete Expense', expense=expense)
+        return render_template('expense.html', title='Delete Expense', expense=expense, currencies=currencies, categories=categories)
 
     def view_expense(self):
         sql = GET_ALL_EXPENSES
