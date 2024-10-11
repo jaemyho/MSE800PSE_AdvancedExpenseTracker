@@ -72,7 +72,6 @@ class ExpenseController:
 
             sql += ";"
         expenses = self.expenses_model.get_all_expense(sql)
-        print(expenses)
 
         if(expenses != ()):
             # Creating a DataFrame
