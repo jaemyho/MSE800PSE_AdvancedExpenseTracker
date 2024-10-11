@@ -51,11 +51,11 @@
     {% for expense in expenses %}
     <tr>
         <td>{{ expense.id }}</td>
-        <td>{{ expense.user_id }}</td>
-        <td>{{ expense.category_id }}</td>
+        <td>{{ expense.user }}</td>
+        <td>{{ expense.category }}</td>
         <td>{{ expense.vendor }}</td>
         <td>{{ expense.description }}</td>
-        <td>{{ expense.currency_id }}</td>
+        <td>{{ expense.currency }}</td>
         <td>{{ expense.amount }}</td>
         <td>{{ expense.date }}</td>
         <td>{{ expense.bank_statement }}</td>

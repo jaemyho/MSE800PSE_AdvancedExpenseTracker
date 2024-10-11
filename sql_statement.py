@@ -150,7 +150,10 @@ CATEGORY_TABLE = "AET_categories"
 BANK_STATEMENT_TABLE = "AET_bank_statement_info"
 
 #SELECT SCRIPT
-GET_ALL_EXPENSES = f"SELECT * FROM {EXPENSE_TABLE};"
+GET_ALL_EXPENSES = (f"SELECT exp.*, usr.username as user, curr.code as currency, cat.category as category FROM {EXPENSE_TABLE} as exp "
+                    f"LEFT JOIN {USER_TABLE} as usr ON exp.user_id = usr.id "
+                    f"LEFT JOIN {CURRENCY_TABLE} as curr ON exp.currency_id = curr.id "
+                    f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id;")
 GET_EXPENSE_BY_ID = f"SELECT * FROM {EXPENSE_TABLE} WHERE id = %s;"
 GET_ALL_AUDITLOG = f"SELECT * FROM {AUDITLOG_TABLE};"
 GET_ALL_CURRENCIES = f"SELECT * FROM {CURRENCY_TABLE};"
