@@ -326,3 +326,102 @@ a.back-button:focus {
         height: 200px !important;
         max-width: 100%;
     }*/
+  /* Horizontal Menu Styles */
+.horizontal_menu {
+    display: flex; /* Use flexbox to arrange menu items horizontally */
+    justify-content: center; /* Center the menu items */
+    padding: 10px 0; /* Padding for vertical spacing */
+    margin-top: 20px; /* Add top margin */
+}
+
+.horizontal_menu a {
+    text-decoration: none; /* Remove underline from links */
+    color:  #585EBC; /* Text color */
+    padding: 14px 20px; /* Padding for clickable area */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    border-radius: 5px;
+    border: 2px solid #585EBC; /* Add a border with the same color as the text */
+    margin: 0 10px; /* Add horizontal margin between items */
+}
+
+.horizontal_menu a:hover {
+    background-color: #585EBC; /* Change background color on hover */
+    color: white;
+}
+
+.horizontal_menu a.active {
+    background-color: #585EBC; /* Highlight color for active menu item */
+    color: white; /* Ensure text is white */
+}
+
+
+
+/* Container for the upload form */
+.upload_folder {
+    width: 400px; /* Set a fixed width for the form */
+    margin: 50px auto; /* Center the form horizontally */
+    padding: 20px; /* Add padding inside the container */
+    text-align: center; /* Center the text and elements inside */
+}
+
+/* Style for the heading */
+.upload_folder h1 {
+    font-size: 24px;
+    color: black; /* Set text color to black */
+    margin-bottom: 20px; /* Add spacing below the heading */
+}
+
+/* Flex container for aligning file input to the right */
+.upload_folder form {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between file input and button */
+    align-items: center; /* Align items vertically in the center */
+}
+
+/* Style for the file input */
+.upload_folder input[type="file"] {
+    padding: 8px; /* Adjust padding for consistency */
+    border: 2px solid #585EBC; /* Add a border with brand color */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 0; /* Remove bottom margin */
+    flex-grow: 1; /* Allow it to grow and push the button to the right */
+}
+
+/* Style for the upload button */
+.upload_folder input[type="submit"] {
+    background-color: #585EBC; /* Button background color */
+    color: white; /* Button text color */
+    padding: 8px 20px; /* Adjust padding for better alignment */
+    border: 2px solid #585EBC; /* Add border to the button */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Show pointer on hover */
+    font-size: 16px; /* Larger font size */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover */
+    margin-left: 10px; /* Space between the file input and button */
+}
+
+/* Hover effect for the upload button */
+.upload_folder input[type="submit"]:hover {
+    background-color: #3c4096; /* Darker shade of the button color */
+    transform: scale(1.05); /* Slightly increase size on hover */
+    border-color: #3c4096; /* Darker border on hover */
+}
+
+/* Adjust input and button for mobile */
+@media (max-width: 500px) {
+    .upload_folder {
+        width: 100%; /* Make the form take full width on small screens */
+        margin: 20px; /* Add a little more margin */
+    }
+
+    .upload_folder form {
+        flex-direction: column; /* Stack items vertically on small screens */
+        align-items: stretch;
+    }
+
+    .upload_folder input[type="file"],
+    .upload_folder input[type="submit"] {
+        width: 100%; /* Make both file input and button full width on mobile */
+        margin-bottom: 10px; /* Add spacing between file input and button */
+    }
+}

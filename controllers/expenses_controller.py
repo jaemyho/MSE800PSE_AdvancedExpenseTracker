@@ -124,7 +124,7 @@ class ExpenseController:
             return render_template('results.html', items=items, total=amount)
 
             # Render the upload form for GET requests
-        return render_template('upload_file.html')
+        return render_template('upload_file.html',title='Receipt Expense')
 
 
     def get_bank_statement_data(self):
@@ -145,6 +145,7 @@ class ExpenseController:
 
             return render_template('results.html', parsed_data=parsed_data, matched_receipts=matched_receipts)
 
+        return render_template('upload_file.html',title='Bank Statement Expense')
 
     def compare_transactions(self,transactions):
         """Implement logic to compare transactions with stored receipts."""
