@@ -1,10 +1,12 @@
 #Testing MVC Flask
-from flask import Flask
+from flask import Flask, session
 from flask_mysqldb import MySQL
 from config import Config
+from controllers.auth_controller import AuthController
 from controllers.expenses_controller import ExpenseController
 from controllers.database_controller import DatabaseController
 from controllers.auditlog_controller import AuditlogController
+from controllers.auth_controller import AuthController
 
 app = Flask(__name__, template_folder='views')  # Change the template folder to 'views'
 
@@ -16,13 +18,33 @@ mysql = MySQL(app)
 expense_controller = ExpenseController(mysql,app)
 database_controller = DatabaseController(mysql)
 auditlog_controller = AuditlogController(mysql)
+auth_controller = AuthController(mysql,app)
 
 # Routes
-@app.route('/')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    return auth_controller.register()
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    return auth_controller.login()
+
+@app.route('/logout')
+def logout():
+    return auth_controller.logout()
+
+@app.route('/dashboard', methods=['GET', 'POST'])
 def index():
     return expense_controller.index()
 @app.route('/add_expense', methods=['GET', 'POST'])
 def add_expense():
+    # Check if the user is logged in
+    redirect_response = auth_controller.check_login()
+    if redirect_response:
+        return redirect_response  # Redirect to login if not logged in
+
+    # Proceed to add expense if logged in
     return expense_controller.add_expense()
 
 @app.route('/edit_expense/<int:expense_id>', methods=['GET', 'POST'])
@@ -35,6 +57,10 @@ def delete_expense(expense_id):
 
 @app.route('/expenses/scan_file', methods=['GET', 'POST'])
 def upload_file():
+    redirect_response = auth_controller.check_login()
+    if redirect_response:
+        return redirect_response  # Redirect to login if not logged in
+
     return expense_controller.get_receipt_data()
 
 @app.route('/expenses/upload_bank_statement', methods=['GET', 'POST'])

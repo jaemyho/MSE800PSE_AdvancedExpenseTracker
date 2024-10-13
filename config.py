@@ -10,3 +10,5 @@ class Config:
 
     # Upload folder configuration
     UPLOAD_FOLDER = 'uploads/'
+
+    SECRET_KEY = '4@!sT&9jP$w5gR^fV#u7K$8qZ*eL3oR'

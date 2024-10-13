@@ -49,7 +49,7 @@ CREATE_USER_TABLE = """
 CREATE TABLE IF NOT EXISTS `AET_users` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
   `company_id` VARCHAR(45) NOT NULL,
   `role_id` VARCHAR(45) NOT NULL,
   `first_name` VARCHAR(45) NOT NULL,
