@@ -16,6 +16,19 @@ class UserModel:
         finally:
             cursor.close()
 
+    def add_company_details(self, company_name):
+        cursor = self.mysql.connection.cursor()
+        try:
+            cursor.execute(
+                "INSERT INTO AET_company (company_name) VALUES (%s,)",
+                (company_name))
+            self.mysql.connection.commit()
+        except Exception as e:
+            self.mysql.connection.rollback()
+            print(f"Error adding user: {e}")
+        finally:
+            cursor.close()
+
     def get_user_by_username(self, username):
         cursor = self.mysql.connection.cursor()
         try:

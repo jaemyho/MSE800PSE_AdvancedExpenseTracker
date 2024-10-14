@@ -39,6 +39,7 @@ class AuthController:
             self.user_model.add_user(
                 username, hashed_password, first_name, last_name, email, contact_number
             )
+            self.user_model.add_company_details(company_name)
             flash("Registration successful! Please login.", "success")
             return redirect(url_for('login'))
 
