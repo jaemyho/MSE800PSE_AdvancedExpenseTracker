@@ -4,11 +4,11 @@ class UserModel:
     def __init__(self, mysql):
         self.mysql = mysql
 
-    def add_user(self, username, password,first_name,last_name,email,contact_number):
+    def add_user(self, username, password,first_name,last_name,email,contact_number, company_id):
         cursor = self.mysql.connection.cursor()
         try:
-            cursor.execute("INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number) VALUES (%s, %s, %s,%s, %s, %s)",
-                           (username, password,first_name,last_name,email,contact_number))
+            cursor.execute("INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number, company_id) VALUES (%s, %s, %s,%s, %s, %s, %s)",
+                           (username, password,first_name,last_name,email,contact_number, company_id))
             self.mysql.connection.commit()
         except Exception as e:
             self.mysql.connection.rollback()
@@ -19,13 +19,15 @@ class UserModel:
     def add_company_details(self, company_name):
         cursor = self.mysql.connection.cursor()
         try:
-            cursor.execute(
-                "INSERT INTO AET_company (company_name) VALUES (%s,)",
-                (company_name))
+            query = "INSERT INTO AET_company (company_name) VALUES (%s)"
+            values = (company_name,)
+            cursor.execute(query, values)
             self.mysql.connection.commit()
+            company_id = cursor.lastrowid
+            return company_id
         except Exception as e:
             self.mysql.connection.rollback()
-            print(f"Error adding user: {e}")
+            print(f"Error adding company: {e}")
         finally:
             cursor.close()
 

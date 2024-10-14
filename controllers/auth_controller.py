@@ -35,11 +35,13 @@ class AuthController:
                 flash("Username or email already exists", "danger")
                 return redirect(url_for('register'))
 
+            company_id = self.user_model.add_company_details(company_name)
+
             # Register the user
             self.user_model.add_user(
-                username, hashed_password, first_name, last_name, email, contact_number
+                username, hashed_password, first_name, last_name, email, contact_number, company_id
             )
-            self.user_model.add_company_details(company_name)
+
             flash("Registration successful! Please login.", "success")
             return redirect(url_for('login'))
 
@@ -58,7 +60,7 @@ class AuthController:
                 session['username'] = user['username']
                 session['logged_in'] = True
                 flash('Login successful!', 'success')
-                return redirect(url_for('index'))  # Redirect to the dashboard or main page
+                return redirect(url_for('dashboard'))  # Redirect to the dashboard or main page
             else:
                 flash('Invalid username or password', 'danger')
                 return redirect(url_for('login'))
