@@ -60,7 +60,7 @@ class AuthController:
                 session['username'] = user['username']
                 session['logged_in'] = True
                 flash('Login successful!', 'success')
-                return redirect(url_for('dashboard'))  # Redirect to the dashboard or main page
+                return redirect(url_for('index'))  # Redirect to the dashboard or main page
             else:
                 flash('Invalid username or password', 'danger')
                 return redirect(url_for('login'))
