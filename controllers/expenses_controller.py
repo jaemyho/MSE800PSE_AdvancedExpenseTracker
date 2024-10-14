@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, session
 from models.expenses_model import ExpensesModel
 from file_upload_handler import FileUploadHandler
 from receipt_reader import ReceiptReader
@@ -14,10 +14,43 @@ class ExpenseController:
         self.expenses_model = ExpensesModel(mysql,app)
         self.currency_controller = CurrencyController(mysql)
         self.category_controller = CategoryController(mysql)
+        self.expense_filter = "all"
+        self.filters = {
+            "all": "",
+            "week": EXPENSE_FILTER_THIS_WEEK,
+            "month": EXPENSE_FILTER_THIS_MONTH,
+            "year": EXPENSE_FILTER_THIS_YEAR
+        }
 
     #Home page
-    def index(self):
-        return render_template('index.html')
+    def dashboard(self):
+        if request.method == 'POST':
+            self.expense_filter = request.form['filter']
+
+        filter_value = self.filters.get(self.expense_filter, None)
+
+        total_expense_amount = self.expenses_model.get_total_expenses_amount(filter_value)
+        total_expense_records = self.expenses_model.get_total_expenses_records(filter_value)
+        max_expense_record = self.expenses_model.get_highest_expense_record(filter_value)
+        today_total_expense = self.expenses_model.get_today_total_expenses()
+        yesteday_total_expense = self.expenses_model.get_yesterday_total_expenses()
+        total_expense_group_date = self.expenses_model.get_total_expense_group_date(filter_value)
+        total_expense_group_category = self.expenses_model.get_total_expense_group_category(filter_value)
+
+        self.safe_round(max_expense_record['amount'])
+        data = {
+            'total_expense': self.safe_round(total_expense_amount),
+            'total_records': total_expense_records,
+            'max_expense_record' : max_expense_record,
+            'today_total_expense': self.safe_round(today_total_expense),
+            'yesterday_total_expense': self.safe_round(yesteday_total_expense),
+            'total_expense_group_date': total_expense_group_date,
+            'total_expense_group_category': total_expense_group_category
+        }
+        return render_template('dashboard.html', **data)
+
+    def safe_round(self, value):
+        return round(value, 2) if value is not None else 0
 
     def add_expense(self):
         currencies = self.currency_controller.get_all_currencies()
@@ -32,7 +65,14 @@ class ExpenseController:
             receipt = 0
             self.expenses_model.add_expense(vendor, category, description, currency, amount, date,receipt)
             return redirect(url_for('add_expense'))  # Redirect to the add user page after successful submission
-        return render_template('expense.html', title='Add Expense', expense="", currencies=currencies, categories=categories)
+
+        data = {
+            'title' : 'Add Expense',
+            'expense' : "",
+            'currencies' : currencies,
+            'categories' : categories
+        }
+        return render_template('expense.html', **data)
 
     def edit_expense(self, expense_id):
         expense = self.expenses_model.get_expense_by_id(expense_id)
@@ -47,7 +87,14 @@ class ExpenseController:
             date = request.form['expense_date']
             self.expenses_model.update_expense(expense_id, vendor, category, description, currency, amount, date, expense)
             return redirect(url_for('report'))
-        return render_template('expense.html', title='Edit Expense',expense=expense, currencies=currencies, categories=categories)
+
+        data = {
+            'title': 'Edit Expense',
+            'expense': expense,
+            'currencies': currencies,
+            'categories': categories
+        }
+        return render_template('expense.html', **data)
 
     def delete_expense(self, expense_id):
         expense = self.expenses_model.get_expense_by_id(expense_id)
@@ -56,7 +103,14 @@ class ExpenseController:
         if request.method == 'POST':
             self.expenses_model.delete_expense(expense_id,expense)
             return redirect(url_for('report'))
-        return render_template('expense.html', title='Delete Expense', expense=expense, currencies=currencies, categories=categories)
+
+        data = {
+            'title': 'Delete Expense',
+            'expense': expense,
+            'currencies': currencies,
+            'categories': categories
+        }
+        return render_template('expense.html', **data)
 
     def view_expense(self):
         sql = GET_ALL_EXPENSES
@@ -70,11 +124,11 @@ class ExpenseController:
             sql += " WHERE 1=1"
 
             if type == "weekly":
-                sql += " AND YEARWEEK(date) = YEARWEEK(CURRENT_DATE())"
+                sql += EXPENSE_FILTER_THIS_WEEK
             elif type == "monthly":
-                sql += " AND MONTH(date) = MONTH(CURRENT_DATE())"
+                sql += EXPENSE_FILTER_THIS_MONTH
             elif type == "annually":
-                sql += " AND YEAR(date) = YEAR(CURRENT_DATE())"
+                sql += EXPENSE_FILTER_THIS_YEAR
             if start_date != "":
                 sql += " AND date >= '" + start_date + "'"
             if end_date != "":
@@ -91,7 +145,15 @@ class ExpenseController:
             grouped_category = df.groupby('category_id')['amount'].sum().reset_index()
             grouped_dict_category = grouped_category.to_dict(orient='records')
 
-        return render_template('report.html', expenses=expenses, search_type=type, search_start=start_date, search_end=end_date, grouped_category=grouped_dict_category)
+        data = {
+            'expenses' : expenses,
+            'serach_type' : type,
+            'start_date' : start_date,
+            'end_date' : end_date,
+            'grouped_dict_category' : grouped_dict_category
+        }
+
+        return render_template('report.html', **data)
 
     def get_receipt_data(self):
         if request.method == 'POST':

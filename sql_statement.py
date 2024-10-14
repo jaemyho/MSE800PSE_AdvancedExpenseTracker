@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `AET_auditlog` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` VARCHAR(45) NOT NULL,
   `user` VARCHAR(45) NOT NULL,
+  `company_id` VARCHAR(45) NOT NULL,
   `insert_date` DATETIME NOT NULL,
   `function_name` VARCHAR(45) NOT NULL,
   `table_name` VARCHAR(45) NOT NULL,
@@ -69,10 +70,10 @@ CREATE TABLE IF NOT EXISTS `AET_roles` (
 CREATE_COMPANY_TABLE = """
 CREATE TABLE IF NOT EXISTS `AET_company` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `company_name` VARCHAR(45) NULL,
+  `company_name` VARCHAR(45) NOT NULL,
   `industry` VARCHAR(45) NULL,
   `email` VARCHAR(45) NULL,
-  `default_currency_id` INT NOT NULL,
+  `default_currency_id` INT NULL,
   PRIMARY KEY (`id`));
 """
 
@@ -148,19 +149,37 @@ COMPANY_TABLE = "AET_company"
 CURRENCY_TABLE = "AET_currency"
 CATEGORY_TABLE = "AET_categories"
 BANK_STATEMENT_TABLE = "AET_bank_statement_info"
+EXPENSE_FILTER_THIS_WEEK = " AND YEARWEEK(date, 1) = YEARWEEK(CURDATE(), 1)"
+EXPENSE_FILTER_THIS_MONTH = " AND YEAR(date) = YEAR(CURDATE()) AND MONTH(date) = MONTH(CURDATE());"
+EXPENSE_FILTER_THIS_YEAR = " AND YEAR(date) = YEAR(CURDATE());"
+GROUP_BY_DATE = " GROUP BY DATE(date);"
+GROUP_BY_CAT_CATEGORY = " GROUP BY cat.category;"
+
 
 #SELECT SCRIPT
 GET_ALL_EXPENSES = (f"SELECT exp.*, usr.username as user, curr.code as currency, cat.category as category FROM {EXPENSE_TABLE} as exp "
                     f"LEFT JOIN {USER_TABLE} as usr ON exp.user_id = usr.id "
                     f"LEFT JOIN {CURRENCY_TABLE} as curr ON exp.currency_id = curr.id "
-                    f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id;")
-GET_EXPENSE_BY_ID = f"SELECT * FROM {EXPENSE_TABLE} WHERE id = %s;"
-GET_ALL_AUDITLOG = f"SELECT * FROM {AUDITLOG_TABLE};"
+                    f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id WHERE exp.company_id = %s;")
+GET_EXPENSE_BY_ID = f"SELECT * FROM {EXPENSE_TABLE} WHERE id = %s and company_id = %s;"
+GET_ALL_AUDITLOG = f"SELECT * FROM {AUDITLOG_TABLE} WHERE company_id = %s;"
 GET_ALL_CURRENCIES = f"SELECT * FROM {CURRENCY_TABLE};"
 GET_ALL_CATEGORIES = f"SELECT * FROM {CATEGORY_TABLE};"
+GET_TOTAL_EXPENSES = f"SELECT sum(amount) AS total_expense FROM {EXPENSE_TABLE} WHERE company_id = %s;"
+GET_TOTAL_EXPENSE_RECORDS = f"SELECT COUNT(*) AS total_records FROM {EXPENSE_TABLE} WHERE company_id = %s"
+GET_HIGHEST_EXPENSE_RECORD = f"SELECT max(exp.amount) AS amount, cat.category FROM {EXPENSE_TABLE} as exp LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id  WHERE exp.company_id = %s"
+GET_TODAY_TOTAL_EXPENSES = f"SELECT SUM(amount) AS total_amount FROM {EXPENSE_TABLE} WHERE company_id = %s AND DATE(date) = CURDATE();"
+GET_YESTERDAY_TOTAL_EXPENSES = f"SELECT SUM(amount) AS total_amount FROM {EXPENSE_TABLE} WHERE company_id = %s AND DATE(date) = CURDATE() - INTERVAL 1 DAY;"
+GET_TOTAL_EXPENSE_BY_DAYS = f"SELECT DATE(date) as date, SUM(amount) as amount FROM {EXPENSE_TABLE} WHERE company_id = %s "
+GET_TOTAL_EXPENSE_GROUP_DATE = f"SELECT DATE(date) as date, SUM(amount) as amount FROM {EXPENSE_TABLE} WHERE company_id = %s "
+GET_EXPENSE_GROUP_BY_CATEGORY = (f"SELECT cat.category, COALESCE(SUM(exp.amount), 0) AS amount "
+                                 f"FROM {CATEGORY_TABLE} AS cat "
+                                 f"LEFT JOIN {EXPENSE_TABLE} AS exp "
+                                 f"ON exp.category_id = cat.id AND exp.company_id = %s ")
+
 
 #INSERT SCRIPT
-ADD_AUDITLOG = f"INSERT INTO {AUDITLOG_TABLE} (type, user, insert_date, function_name, table_name, sql_statement, record) VALUES (%s, %s, %s, %s, %s, %s, %s);"
+ADD_AUDITLOG = f"INSERT INTO {AUDITLOG_TABLE} (type, user, company_id, insert_date, function_name, table_name, sql_statement, record) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
 ADD_SINGLE_EXPENSE = f"INSERT INTO {EXPENSE_TABLE} (user_id, company_id, category_id, vendor, description, currency_id, amount, date, insert_date,receipt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
 
 #UPDATE SCRIPT

@@ -2,6 +2,7 @@ import re
 import datetime
 from sql_statement import *
 import MySQLdb
+from flask import session
 
 class AuditlogModel:
     def __init__(self, mysql):
@@ -32,13 +33,15 @@ class AuditlogModel:
                 return match.group(1)
 
         return ""
-    def add_auditlog(self, funct, user, script, record):
+    def add_auditlog(self, funct, script, record):
+        user = session['user_id']
+        company_id = session['company_id']
         type = self.__get_script_type__(script)
         table = self.__get_script_table__(script)
         current_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
             cur = self.mysql.connection.cursor()
-            values = (type, user, current_date, funct, table, script, record)
+            values = (type, user, company_id, current_date, funct, table, script, record)
             cur.execute(ADD_AUDITLOG, values)
             self.mysql.connection.commit()
             cur.close()
@@ -48,7 +51,8 @@ class AuditlogModel:
     def get_all_auditlog(self, mysql_script= GET_ALL_AUDITLOG):
         try:
             cur = self.mysql.connection.cursor()
-            cur.execute(mysql_script)
+            value = (session['company_id'])
+            cur.execute(mysql_script, value)
             self.mysql.connection.commit()
             auditlogs = cur.fetchall()
             cur.close()

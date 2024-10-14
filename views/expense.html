@@ -48,7 +48,7 @@
             {% endfor %}
         </select>
         <!-- Amount numeric -->
-        <input type="number" id="amount" name="amount" placeholder="Enter Amount" value="{{ expense.amount if expense and expense.amount else '' }}" {% if title == 'Delete Expense' %}disabled{% endif %} required><br><br>
+        <input type="number" id="amount" name="amount" step="0.01"  placeholder="Enter Amount" value="{{ expense.amount if expense and expense.amount else '' }}" {% if title == 'Delete Expense' %}disabled{% endif %} required><br><br>
 
         <!-- Expense Date -->
         <label for="expense_date">Date:</label>

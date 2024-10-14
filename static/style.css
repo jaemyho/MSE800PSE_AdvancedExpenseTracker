@@ -321,11 +321,27 @@ a.back-button:focus {
         transform:translate(-50%,-50%) rotate(10deg);
     }
 }
-/*#expenseChart {
-        width: 70% !important;
-        height: 200px !important;
-        max-width: 100%;
-    }*/
+
+.dashboard {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .dashboard div {
+      background: #fff;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+.summary {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 40px;
+    }
+
   /* Horizontal Menu Styles */
 .horizontal_menu {
     display: flex; /* Use flexbox to arrange menu items horizontally */

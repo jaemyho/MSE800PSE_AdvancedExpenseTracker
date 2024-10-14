@@ -44,8 +44,8 @@ def logout():
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
-def index():
-    return expense_controller.index()
+def dashboard():
+    return expense_controller.dashboard()
 
 @app.route('/add_expense', methods=['GET', 'POST'])
 @login_required

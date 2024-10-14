@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <h2>Expense Dashboard</h2>
+
+  <!-- Dashboard summary details -->
+  <div class="dashboard">
+    <div>
+      <h3>Total Expense</h3>
+      <p>{{total_expense}}</p>
+    </div>
+    <div>
+      <h3>Total Records</h3>
+      <p>{{total_records}}</p>
+    </div>
+    <div>
+      <h3>Highest Spending</h3>
+      <p>{{max_expense_record.category}}</p>
+      <p>{{max_expense_record.amount}}</p>
+    </div>
+    <div>
+      <h3>Today Spending</h3>
+      <p>{{today_total_expense}}</p>
+    </div>
+    <div>
+      <h3>Yesterday Spending</h3>
+      <p>{{yesterday_total_expense}}</p>
+    </div>
+  </div>
+
+  <div class="summary">
+    <!-- Monthly Summary Bar Chart -->
+    <!--div class="chart-container">
+        <canvas id="monthlyChart"></canvas>
+        <div class="chart-title">Monthly Summary</div>
+    </div-->
+
+    <!-- Category Summary Pie Chart -->
+    <div class="chart-container">
+        <canvas id="categoryChart" width="400" height="400"></canvas>
+        <div class="chart-title">Category Summary</div>
+    </div>
+  </div>
+
+  <script>
+    // Pie chart for Category Summary
+    // Prepare data passed from the Python backend total_expense_group_category
+    var categories = {{ total_expense_group_category | map(attribute='category') | list | tojson }};
+    var amounts = {{ total_expense_group_category | map(attribute='amount') | list | tojson }};
+
+    var ctx = document.getElementById('categoryChart').getContext('2d');
+    var categoryChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: categories,
+            datasets: [{
+                label: 'Expense Distribution',
+                data: amounts,  // Amounts for the chart
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(199, 199, 199, 0.6)',
+                    'rgba(123, 45, 67, 0.6)',
+                    'rgba(34, 102, 255, 0.6)',
+                    'rgba(90, 200, 86, 0.6)',
+                    'rgba(255, 130, 64, 0.6)',
+                    'rgba(192, 192, 192, 0.6)',
+                    'rgba(150, 75, 125, 0.6)',
+                    'rgba(199, 199, 199, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(199, 199, 199, 1)',
+                    'rgba(123, 45, 67, 1)',
+                    'rgba(34, 102, 255, 1)',
+                    'rgba(90, 200, 86, 1)',
+                    'rgba(255, 130, 64, 1)',
+                    'rgba(192, 192, 192, 1)',
+                    'rgba(150, 75, 125, 1)',
+                    'rgba(199, 199, 199, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Bar chart for Monthly Summary
+    var ctx2 = document.getElementById('monthlyChart').getContext('2d');
+    var monthlyChart = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Entertainment', 'Atlanta United Games', 'Food', 'Transportation', 'Gas'],
+        datasets: [{
+          label: 'Total Amount in USD',
+          data: [115.64, 20.00, 48.54, 8.35, 30.86],
+          backgroundColor: '#36A2EB',
+          borderColor: '#36A2EB',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: {
+            display: false,
+          }
+        }
+      }
+    });
+  </script>
+{% endblock %}

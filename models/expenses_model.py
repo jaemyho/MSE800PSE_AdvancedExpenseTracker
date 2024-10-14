@@ -2,6 +2,7 @@ import os
 from sql_statement import *
 from models.auditlog_model import AuditlogModel
 import datetime
+from flask import session
 
 class ExpensesModel:
     def __init__(self, mysql,app):
@@ -16,10 +17,10 @@ class ExpensesModel:
 
     def add_expense(self,vendor, category, description, currency, amount, inp_date,receipt):
         try:
-            user_id = 1 #dummy data
-            company_id = 1 #dummy data
-            category_id = 1 #dummy data
-            currency_id = 1 #dummy data
+            user_id = session['user_id']
+            company_id = session['company_id']
+            category_id = category
+            currency_id = currency
             insert_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             cur = self.mysql.connection.cursor()
             values = (user_id, company_id, category_id, vendor, description, currency_id, amount, inp_date, insert_date,receipt)
@@ -27,19 +28,18 @@ class ExpensesModel:
             self.mysql.connection.commit()
             cur.close()
 
-            self.auditlog.add_auditlog("add_expense","User",ADD_SINGLE_EXPENSE % values, str(values)) #dummy data
+            self.auditlog.add_auditlog("add_expense",ADD_SINGLE_EXPENSE % values, str(values))
         except Exception as e:
             print(f"Expenses Add Expense Error : {e}")
 
     def update_expense(self, expense_id, vendor, category, description, currency, amount, inp_date, previous_expense):
         try:
-            currency = 1 #dummy data replace with currency id
             values = (vendor, category, description, currency, amount, inp_date, expense_id)
             cur = self.mysql.connection.cursor()
             cur.execute(UPDATE_SINGLE_EXPENSE_BY_ID, values)
             self.mysql.connection.commit()
             cur.close()
-            self.auditlog.add_auditlog("update_expense", "User", UPDATE_SINGLE_EXPENSE_BY_ID % values, str(previous_expense))  # dummy data
+            self.auditlog.add_auditlog("update_expense", UPDATE_SINGLE_EXPENSE_BY_ID % values, str(previous_expense))
         except Exception as e:
             print(f"Expenses Update Expense Error : {e}")
 
@@ -50,14 +50,15 @@ class ExpensesModel:
             cur.execute(DELETE_SINGLE_EXPENSE_BY_ID, values)
             self.mysql.connection.commit()
             cur.close()
-            self.auditlog.add_auditlog("delete_expense", "User", DELETE_SINGLE_EXPENSE_BY_ID % values, str(expense_details))  # dummy data
+            self.auditlog.add_auditlog("delete_expense", DELETE_SINGLE_EXPENSE_BY_ID % values, str(expense_details))
         except Exception as e:
             print(f"Expenses Delete Expense Error : {e}")
 
     def get_all_expense(self,mysql_script = GET_ALL_EXPENSES):
         try:
             cur = self.mysql.connection.cursor()
-            cur.execute(mysql_script)
+            values =(session['company_id'],)
+            cur.execute(mysql_script,values)
             self.mysql.connection.commit()
             expenses = cur.fetchall()
             cur.close()
@@ -69,7 +70,7 @@ class ExpensesModel:
     def get_expense_by_id(self,expense_id):
         try:
             cur = self.mysql.connection.cursor()
-            values = (expense_id,)
+            values = (expense_id, session['company_id'])
             cur.execute(GET_EXPENSE_BY_ID, values)
             self.mysql.connection.commit()
             expense = cur.fetchone()
@@ -77,4 +78,101 @@ class ExpensesModel:
             return expense
         except Exception as e:
             print(f"Get Expense by Id Error : {e}")
+            return ()
+
+    def get_total_expenses_amount(self , filter_script = ""):
+        try:
+            cur = self.mysql.connection.cursor()
+            script = GET_TOTAL_EXPENSES + filter_script
+            value = (session['company_id'],)
+            cur.execute(script, value)
+            self.mysql.connection.commit()
+            total_expense = cur.fetchone()
+            cur.close()
+            return total_expense["total_expense"] if total_expense and total_expense["total_expense"] != "" else 0
+        except Exception as e:
+            print(f"Get Total Expenses Error : {e}")
+            return 0
+
+    def get_total_expenses_records(self, filter_script = ""):
+        try:
+            cur = self.mysql.connection.cursor()
+            script = GET_TOTAL_EXPENSE_RECORDS + filter_script
+            value = (session['company_id'],)
+            cur.execute(script, value)
+            self.mysql.connection.commit()
+            total_records = cur.fetchone()
+            cur.close()
+            return total_records["total_records"] if total_records and total_records["total_records"] != "" else 0
+
+        except Exception as e:
+            print(f"Get Total Expenses Record Error : {e}")
+            return 0
+
+    def get_highest_expense_record(self, filter_script = ""):
+        try:
+            cur = self.mysql.connection.cursor()
+            script = GET_HIGHEST_EXPENSE_RECORD + filter_script
+            value = (session['company_id'],)
+            cur.execute(script, value)
+            self.mysql.connection.commit()
+            highest_expense = cur.fetchone()
+            cur.close()
+            return highest_expense
+        except Exception as e:
+            print(f"Get Highest Expense Record Error : {e}")
+            return ()
+
+    def get_today_total_expenses(self):
+        try:
+            cur = self.mysql.connection.cursor()
+            value = (session['company_id'],)
+            cur.execute(GET_TODAY_TOTAL_EXPENSES, value)
+            self.mysql.connection.commit()
+            today_expense = cur.fetchone()
+            cur.close()
+            return today_expense["total_amount"] if today_expense and today_expense["total_amount"] != "" else 0
+        except Exception as e:
+            print(f"Get Today Total Expense Error : {e}")
+            return 0
+
+    def get_yesterday_total_expenses(self):
+        try:
+            cur = self.mysql.connection.cursor()
+            value = (session['company_id'],)
+            cur.execute(GET_YESTERDAY_TOTAL_EXPENSES, value)
+            self.mysql.connection.commit()
+            yesterday_expense = cur.fetchone()
+            cur.close()
+            return yesterday_expense["total_amount"] if yesterday_expense and yesterday_expense["total_amount"] != "" else 0
+        except Exception as e:
+            print(f"Get Yesterday Total Expense Error : {e}")
+            return 0
+
+    def get_total_expense_group_date(self, filter_script = ""):
+        try:
+            cur = self.mysql.connection.cursor()
+            script = GET_TOTAL_EXPENSE_GROUP_DATE + filter_script + GROUP_BY_DATE
+            value = (session['company_id'],)
+            cur.execute(script, value)
+            self.mysql.connection.commit()
+            result = cur.fetchall()
+            cur.close()
+            return result
+        except Exception as e:
+            print(f"Get Total Expense Group By Date Error : {e}")
+            return ()
+
+    def get_total_expense_group_category(self, filter_script = ""):
+        try:
+            cur = self.mysql.connection.cursor()
+            script = GET_EXPENSE_GROUP_BY_CATEGORY + filter_script + GROUP_BY_CAT_CATEGORY
+            value = (session['company_id'],)
+            cur.execute(script, value)
+            self.mysql.connection.commit()
+            result = cur.fetchall()
+            cur.close()
+            return result
+        except Exception as e:
+            print(f"Get Total Expense Group By Category Error : {e}")
             return ()

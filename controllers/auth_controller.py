@@ -58,6 +58,7 @@ class AuthController:
                 # Set user session
                 session['user_id'] = user['id']
                 session['username'] = user['username']
+                session['company_id'] = user['company_id']
                 session['logged_in'] = True
                 flash('Login successful!', 'success')
                 return redirect(url_for('index'))  # Redirect to the dashboard or main page
@@ -80,8 +81,8 @@ class AuthController:
         if not session.get('logged_in'):
             flash("You must be logged in to access this page", "warning")
             return redirect(url_for('login'))  # Redirect to login if not logged in
-        else:
-            print("logged in user", session.get('user_id'))
+        # else:
+        #     print("logged in user", session.get('user_id'))
         return None
 
 # Helper functions
