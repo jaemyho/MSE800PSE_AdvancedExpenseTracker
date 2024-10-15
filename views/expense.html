@@ -15,9 +15,9 @@
     <form action="{% if title == 'Add Expense' %}
     {{ url_for('add_expense') }}
     {% elif title == 'Receipt Expense' %}
-    {{ url_for('expenses/scan_file') }}
+    {{ url_for('upload_file') }}
     {% elif title == 'Bank Statement Expense' %}
-    {{ url_for('expenses/upload_bank_statement') }}
+    {{ url_for('upload_bank_statement') }}
     {% else %}
     {{ url_for('add_expense') }}
     {% endif %}" method="POST">
@@ -56,11 +56,17 @@
 
         <div class="button-container">
             <!-- Submit Button -->
-            <input type="submit" value="{{ title }}">
+            {% if title != 'Receipt Expense' %}
+             <input type="submit" value="{{ title }}">
+            {% else %}
+            <input type="submit" value="OK">
+            {% endif %}
 
             {% if title == 'Edit Expense' or title == 'Delete Expense' %}
             <!-- Back Button -->
             <a href="{{ url_for('report') }}" class="back-button">Back</a>
+            {% elif title == 'Receipt Expense' %}
+            <a href="{{ url_for('upload_file') }}" class="back-button">Back </a>
             {% endif %}
         </div>
     </form>

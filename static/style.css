@@ -193,6 +193,12 @@ th, td {
     gap: 20px; /* Adds space between buttons */
     margin-top: 20px;
 }
+ .expense .button-container input[value="OK"]:hover {
+    background: green;
+    color: #dddddd;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
 
 /* Styling for the submit button */
 .expense input[type="submit"] {

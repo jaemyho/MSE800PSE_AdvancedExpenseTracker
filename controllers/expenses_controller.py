@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import render_template, request, redirect, url_for, session
 from models.expenses_model import ExpensesModel
 from file_upload_handler import FileUploadHandler
@@ -156,6 +158,8 @@ class ExpenseController:
         return render_template('report.html', **data)
 
     def get_receipt_data(self):
+        currencies = self.currency_controller.get_all_currencies()
+        categories = self.category_controller.get_all_categories()
         if request.method == 'POST':
             # Handle file upload
             upload_handler = FileUploadHandler(request, self.app.config['UPLOAD_FOLDER'])
@@ -171,7 +175,12 @@ class ExpenseController:
             receipt_details = receipt_reader.parse_receipt_data(extracted_text)
 
             vendor = receipt_details['vendor']
+            # converting date into the YYYY-MM-DD format
+            date_string = receipt_details['date']  # initial 'MM/DD/YYYY' format
+            date_object = datetime.strptime(date_string, '%m/%d/%Y')
+            receipt_details['date'] = date_object.strftime('%Y-%m-%d')  # Converted  'YYYY-MM-DD' format
             date = receipt_details['date']
+
             currency = receipt_details['currency']
             items = receipt_details['items']
             categorized_items = receipt_reader.categorize_items(items)
@@ -183,7 +192,9 @@ class ExpenseController:
             self.expenses_model.add_expense(vendor, category, description, currency, amount, date, receipt)
 
             # Pass data to the template
-            return render_template('results.html', items=items, total=amount)
+            return render_template('expense.html', title='Receipt Expense', items=items, total=amount,
+                                   expense=receipt_details, currencies=currencies, categories=categories)
+            flash("Uploaded successful!.", "success")
 
             # Render the upload form for GET requests
         return render_template('upload_file.html',title='Receipt Expense')

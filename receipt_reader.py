@@ -86,11 +86,15 @@ class ReceiptReader:
                     price = self.clean_price(item_match.group(3))  # Clean and convert the price
                     items.append((item_name, price))  # Store items as tuples of (item_name, price)
 
+        amount = self.extract_total(extracted_text)
+
         return {
             "vendor": vendor,
             "date": date,
             "currency": currency,
-            "items": items
+            "items": items,
+            "amount":amount,
+            "description":'receipt data'
         }
 
     def extract_total(self, extracted_text):
