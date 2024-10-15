@@ -112,8 +112,9 @@ class ExpensesModel:
     def get_highest_expense_record(self, filter_script = ""):
         try:
             cur = self.mysql.connection.cursor()
-            script = GET_HIGHEST_EXPENSE_RECORD + filter_script
+            script = GET_HIGHEST_EXPENSE_RECORD + filter_script + ORDER_BY_AMOUNT + LIMIT_ONE
             value = (session['company_id'],)
+            print(script)
             cur.execute(script, value)
             self.mysql.connection.commit()
             highest_expense = cur.fetchone()
@@ -175,4 +176,18 @@ class ExpensesModel:
             return result
         except Exception as e:
             print(f"Get Total Expense Group By Category Error : {e}")
+            return ()
+
+    def get_daily_total_expense(self, filter_script = ""):
+        try:
+            cur = self.mysql.connection.cursor()
+            script = GET_DAILY_TOTAL_EXPENSE + filter_script + GROUP_BY_DATE + ORDER_BY_DATE
+            value = (session['company_id'],)
+            cur.execute(script, value)
+            self.mysql.connection.commit()
+            result = cur.fetchall()
+            cur.close()
+            return result
+        except Exception as e:
+            print(f"Get Daily Total Expense Group By Date Error : {e}")
             return ()

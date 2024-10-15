@@ -16,7 +16,7 @@ class ExpenseController:
         self.expenses_model = ExpensesModel(mysql,app)
         self.currency_controller = CurrencyController(mysql)
         self.category_controller = CategoryController(mysql)
-        self.expense_filter = "all"
+        self.expense_filter = "week"
         self.filters = {
             "all": "",
             "week": EXPENSE_FILTER_THIS_WEEK,
@@ -27,9 +27,9 @@ class ExpenseController:
     #Home page
     def dashboard(self):
         if request.method == 'POST':
-            self.expense_filter = request.form['filter']
+            self.expense_filter = request.form['search_type']
 
-        filter_value = self.filters.get(self.expense_filter, None)
+        filter_value = self.filters.get(self.expense_filter, "")
 
         total_expense_amount = self.expenses_model.get_total_expenses_amount(filter_value)
         total_expense_records = self.expenses_model.get_total_expenses_records(filter_value)
@@ -38,16 +38,19 @@ class ExpenseController:
         yesteday_total_expense = self.expenses_model.get_yesterday_total_expenses()
         total_expense_group_date = self.expenses_model.get_total_expense_group_date(filter_value)
         total_expense_group_category = self.expenses_model.get_total_expense_group_category(filter_value)
+        daily_total_expense_group_by_date = self.expenses_model.get_daily_total_expense(filter_value)
 
         self.safe_round(max_expense_record['amount'])
         data = {
+            'search_type': self.expense_filter,
             'total_expense': self.safe_round(total_expense_amount),
             'total_records': total_expense_records,
-            'max_expense_record' : max_expense_record,
+            'max_expense_record': max_expense_record,
             'today_total_expense': self.safe_round(today_total_expense),
             'yesterday_total_expense': self.safe_round(yesteday_total_expense),
             'total_expense_group_date': total_expense_group_date,
-            'total_expense_group_category': total_expense_group_category
+            'total_expense_group_category': total_expense_group_category,
+            'daily_total_expense_group_by_date': daily_total_expense_group_by_date
         }
         return render_template('dashboard.html', **data)
 
@@ -144,7 +147,7 @@ class ExpenseController:
             df = pd.DataFrame(expenses)
 
             # Grouping by category_id and summing the amount
-            grouped_category = df.groupby('category_id')['amount'].sum().reset_index()
+            grouped_category = df.groupby('category')['amount'].sum().reset_index()
             grouped_dict_category = grouped_category.to_dict(orient='records')
 
         data = {

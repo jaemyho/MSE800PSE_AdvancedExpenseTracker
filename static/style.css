@@ -346,6 +346,7 @@ a.back-button:focus {
       display: flex;
       justify-content: space-around;
       margin-top: 40px;
+      height:60%;
     }
 
   /* Horizontal Menu Styles */
