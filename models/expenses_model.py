@@ -114,7 +114,6 @@ class ExpensesModel:
             cur = self.mysql.connection.cursor()
             script = GET_HIGHEST_EXPENSE_RECORD + filter_script + ORDER_BY_AMOUNT + LIMIT_ONE
             value = (session['company_id'],)
-            print(script)
             cur.execute(script, value)
             self.mysql.connection.commit()
             highest_expense = cur.fetchone()
