@@ -33,14 +33,21 @@ class ExpenseController:
 
         total_expense_amount = self.expenses_model.get_total_expenses_amount(filter_value)
         total_expense_records = self.expenses_model.get_total_expenses_records(filter_value)
-        max_expense_record = self.expenses_model.get_highest_expense_record(filter_value)
+        temp_max_expense_record = self.expenses_model.get_highest_expense_record(filter_value)
         today_total_expense = self.expenses_model.get_today_total_expenses()
         yesteday_total_expense = self.expenses_model.get_yesterday_total_expenses()
         total_expense_group_date = self.expenses_model.get_total_expense_group_date(filter_value)
         total_expense_group_category = self.expenses_model.get_total_expense_group_category(filter_value)
         daily_total_expense_group_by_date = self.expenses_model.get_daily_total_expense(filter_value)
 
-        self.safe_round(max_expense_record['amount'])
+        max_expense_record = {
+            'amount': 0,
+            'category': "None"
+        }
+        if temp_max_expense_record != None:
+            max_expense_record['amount'] = self.safe_round(temp_max_expense_record['amount'])
+            max_expense_record['category'] = temp_max_expense_record['category']
+
         data = {
             'search_type': self.expense_filter,
             'total_expense': self.safe_round(total_expense_amount),
