@@ -176,12 +176,14 @@ GET_EXPENSE_GROUP_BY_CATEGORY = (f"SELECT cat.category, COALESCE(SUM(exp.amount)
                                  f"FROM {CATEGORY_TABLE} AS cat "
                                  f"LEFT JOIN {EXPENSE_TABLE} AS exp "
                                  f"ON exp.category_id = cat.id AND exp.company_id = %s ")
-
+GET_USER_BY_USERNAME = f"SELECT * FROM AET_users WHERE username = %s"
+GET_USER_BY_USERNAME_OR_EMAIL = f"SELECT * FROM AET_users WHERE username = %s OR email = %s"
 
 #INSERT SCRIPT
+ADD_NEW_USER = f"INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number, company_id) VALUES (%s, %s, %s,%s, %s, %s, %s)"
 ADD_AUDITLOG = f"INSERT INTO {AUDITLOG_TABLE} (type, user, company_id, insert_date, function_name, table_name, sql_statement, record) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
 ADD_SINGLE_EXPENSE = f"INSERT INTO {EXPENSE_TABLE} (user_id, company_id, category_id, vendor, description, currency_id, amount, date, insert_date,receipt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-
+ADD_COMPANY_DETAILS = f"INSERT INTO AET_company (company_name) VALUES (%s)"
 #UPDATE SCRIPT
 UPDATE_SINGLE_EXPENSE_BY_ID = f"UPDATE {EXPENSE_TABLE} SET vendor = %s, category_id = %s, description = %s, currency_id = %s, amount = %s, date = %s WHERE id = %s;"
 

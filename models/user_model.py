@@ -1,5 +1,8 @@
 from flask_mysqldb import MySQL
 
+from sql_statement import *
+
+
 class UserModel:
     def __init__(self, mysql):
         self.mysql = mysql
@@ -7,7 +10,7 @@ class UserModel:
     def add_user(self, username, password,first_name,last_name,email,contact_number, company_id):
         cursor = self.mysql.connection.cursor()
         try:
-            cursor.execute("INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number, company_id) VALUES (%s, %s, %s,%s, %s, %s, %s)",
+            cursor.execute(ADD_NEW_USER,
                            (username, password,first_name,last_name,email,contact_number, company_id))
             self.mysql.connection.commit()
         except Exception as e:
@@ -19,7 +22,7 @@ class UserModel:
     def add_company_details(self, company_name):
         cursor = self.mysql.connection.cursor()
         try:
-            query = "INSERT INTO AET_company (company_name) VALUES (%s)"
+            query = ADD_COMPANY_DETAILS
             values = (company_name,)
             cursor.execute(query, values)
             self.mysql.connection.commit()
@@ -34,7 +37,7 @@ class UserModel:
     def get_user_by_username(self, username):
         cursor = self.mysql.connection.cursor()
         try:
-            cursor.execute("SELECT * FROM AET_users WHERE username = %s", (username,))
+            cursor.execute(GET_USER_BY_USERNAME, (username,))
             user = cursor.fetchone()
             return user
         finally:
@@ -43,7 +46,7 @@ class UserModel:
     def get_user_by_username_or_email(self, username, email):
         cursor = self.mysql.connection.cursor()
         try:
-            cursor.execute("SELECT * FROM AET_users WHERE username = %s OR email = %s", (username, email))
+            cursor.execute(GET_USER_BY_USERNAME_OR_EMAIL, (username, email))
             user = cursor.fetchone()
             return user
         finally:
