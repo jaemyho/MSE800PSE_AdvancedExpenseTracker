@@ -8,7 +8,7 @@
         <canvas id="expenseChart" ></canvas>
     </div>
 
-    <div style="width:30%;height:200px">
+    <div style="width:30%;height:300px">
         <canvas id="expensePieChart"></canvas>
     </div>
 </div>
@@ -50,7 +50,7 @@
     </tr>
     {% for expense in expenses %}
     <tr>
-        <td>{{ expense.id }}</td>
+        <td>{{ loop.index }}</td>
         <td>{{ expense.user }}</td>
         <td>{{ expense.category }}</td>
         <td>{{ expense.vendor }}</td>
@@ -98,18 +98,17 @@
     });
 
     var ctx = document.getElementById('expensePieChart').getContext('2d');
-
     // Prepare the data for the pie chart
-    var categories = {{ grouped_dict_category|map(attribute='category')|list }};
-    var amounts = {{ grouped_dict_category|map(attribute='amount')|list }};
+    var categories = {{ grouped_dict_category | map(attribute='category') | list | tojson }};
+    var amounts = {{ grouped_dict_category|map(attribute='amount')|list | tojson }};
 
-    var pieChart = new Chart(ctx, {
+    var categoryChart = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: categories, // Expense IDs as labels
+            labels: categories,
             datasets: [{
-                label: 'Expense Amounts',
-                data: amounts,
+                label: 'Expense Distribution',
+                data: amounts,  // Amounts for the chart
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.6)',
                     'rgba(54, 162, 235, 0.6)',
@@ -149,10 +148,8 @@
             responsive: true,
             plugins: {
                 legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    enabled: true
+                    display: true,
+                    position: 'bottom',
                 }
             }
         }

@@ -38,7 +38,7 @@
     </tr>
     {% for expense in auditlogs %}
     <tr>
-        <td>{{ expense.id }}</td>
+        <td>{{ loop.index }}</td>
         <td>{{ expense.type }}</td>
         <td>{{ expense.user }}</td>
         <td>{{ expense.insert_date }}</td>
