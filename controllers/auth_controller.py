@@ -39,7 +39,7 @@ class AuthController:
 
             # Register the user
             self.user_model.add_user(
-                username, hashed_password, first_name, last_name, email, contact_number, company_id
+                username, hashed_password, first_name, last_name, email, contact_number, company_id, "2"
             )
 
             flash("Registration successful! Please login.", "success")
@@ -61,7 +61,7 @@ class AuthController:
                 session['company_id'] = user['company_id']
                 session['logged_in'] = True
                 flash('Login successful!', 'success')
-                return redirect(url_for('index'))  # Redirect to the dashboard or main page
+                return redirect(url_for('dashboard'))  # Redirect to the dashboard or main page
             else:
                 flash('Invalid username or password', 'danger')
                 return redirect(url_for('login'))

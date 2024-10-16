@@ -7,11 +7,11 @@ class UserModel:
     def __init__(self, mysql):
         self.mysql = mysql
 
-    def add_user(self, username, password,first_name,last_name,email,contact_number, company_id):
+    def add_user(self, username, password, first_name,last_name,email,contact_number, company_id, role_id):
         cursor = self.mysql.connection.cursor()
         try:
             cursor.execute(ADD_NEW_USER,
-                           (username, password,first_name,last_name,email,contact_number, company_id))
+                           (username, password,first_name,last_name,email,contact_number, company_id, role_id))
             self.mysql.connection.commit()
         except Exception as e:
             self.mysql.connection.rollback()
