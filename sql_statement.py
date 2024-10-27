@@ -166,7 +166,7 @@ GET_ALL_EXPENSES = (f"SELECT exp.*, usr.username as user, curr.code as currency,
                     f"LEFT JOIN {CURRENCY_TABLE} as curr ON exp.currency_id = curr.id "
                     f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id WHERE exp.company_id = %s;")
 GET_EXPENSE_BY_ID = f"SELECT * FROM {EXPENSE_TABLE} WHERE id = %s and company_id = %s;"
-GET_ALL_AUDITLOG = f"SELECT * FROM {AUDITLOG_TABLE} WHERE company_id = %s;"
+GET_ALL_AUDITLOG = f"SELECT al.*, us.username FROM {AUDITLOG_TABLE} as al LEFT JOIN {USER_TABLE} as us on al.user = us.id WHERE al.company_id = %s"
 GET_ALL_CURRENCIES = f"SELECT * FROM {CURRENCY_TABLE};"
 GET_ALL_CATEGORIES = f"SELECT * FROM {CATEGORY_TABLE};"
 GET_TOTAL_EXPENSES = f"SELECT sum(amount) AS total_expense FROM {EXPENSE_TABLE} WHERE company_id = %s"
@@ -181,7 +181,7 @@ GET_EXPENSE_GROUP_BY_CATEGORY = (f"SELECT cat.category, COALESCE(SUM(exp.amount)
                                  f"LEFT JOIN {EXPENSE_TABLE} AS exp "
                                  f"ON exp.category_id = cat.id AND exp.company_id = %s ")
 GET_USER_BY_USERNAME = f"SELECT * FROM AET_users WHERE username = %s"
-GET_USER_BY_USERNAME_OR_EMAIL = f"SELECT * FROM AET_users WHERE username = %s OR email = %s"
+GET_USER_BY_USERNAME_OR_EMAIL = f"SELECT * FROM {USER_TABLE} WHERE username = %s OR email = %s"
 
 #INSERT SCRIPT
 ADD_NEW_USER = f"INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number, company_id, role_id) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)"

@@ -4,16 +4,22 @@
 <!--<h2>{{ title }}</h2>-->
 
 <!-- Horizontal Menu -->
+{% if title != 'Edit Expense' and title != 'Delete Expense' %}
 <div class="horizontal_menu">
     <a href="{{ url_for('add_expense') }}" class="{% if title == 'Add Expense' %}active{% endif %}">Add Expense</a>
     <a href="{{ url_for('upload_file') }}"  class="{% if title == 'Receipt Expense' %}active{% endif %}">Scan Receipts</a>
     <a href="{{ url_for('upload_bank_statement') }}"  class="{% if title == 'Bank Statement Expense' %}active{% endif %}">Scan Bank Statement</a>
 </div>
+{% endif %}
 
 
 <div class="expense">
     <form action="{% if title == 'Add Expense' %}
     {{ url_for('add_expense') }}
+    {% elif title == 'Edit Expense' %}
+    {{ url_for('edit_expense', expense_id=expense.id) }}
+    {% elif title == 'Delete Expense' %}
+    {{ url_for('delete_expense', expense_id=expense.id) }}
     {% elif title == 'Receipt Expense' %}
     {{ url_for('upload_file') }}
     {% elif title == 'Bank Statement Expense' %}
