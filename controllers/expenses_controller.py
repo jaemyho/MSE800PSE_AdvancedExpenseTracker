@@ -186,14 +186,14 @@ class ExpenseController:
 
             vendor = receipt_details['vendor']
             # converting date into the YYYY-MM-DD format
-            date_string = receipt_details['date']  # initial 'MM/DD/YYYY' format
-            date_object = datetime.strptime(date_string, '%m/%d/%Y')
-            receipt_details['date'] = date_object.strftime('%Y-%m-%d')  # Converted  'YYYY-MM-DD' format
-            date = receipt_details['date']
+            date = receipt_details['date']  # initial 'MM/DD/YYYY' format
+            print("date", date)
 
             currency = receipt_details['currency']
             items = receipt_details['items']
+            print("items", items)
             categorized_items = receipt_reader.categorize_items(items)
+            print("categorized_items", categorized_items)
 
             category = receipt_reader.get_main_category(categorized_items)
             amount = receipt_reader.extract_total(extracted_text)

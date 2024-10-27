@@ -1,101 +1,150 @@
 import re
-from collections import Counter
-
 import cv2
+import os
+import numpy as np
+from collections import Counter
+from pdf2image import convert_from_path
 from pytesseract import pytesseract
-
+from datetime import datetime
 
 class ReceiptReader:
     def __init__(self, image_path):
         self.image_path = image_path
+        self.image = None
+
+    def load_image(self):
+        """Load image from file or convert PDF to image."""
+        print(f"Loading image from: {self.image_path}")
+
+        if not os.path.isfile(self.image_path):
+            raise ValueError(f"File does not exist: {self.image_path}")
+
+        if self.image_path.lower().endswith('.pdf'):
+            try:
+                images = convert_from_path(self.image_path)
+                self.image = images[0]  # Use the first page as the receipt image
+            except Exception as e:
+                raise ValueError(f"Failed to convert PDF to image: {e}")
+        else:
+            self.image = cv2.imread(self.image_path)
+
+        if self.image is None:
+            raise ValueError(f"Image not found or unable to load: {self.image_path}")
 
     def preprocess_image(self):
         """Preprocess the image for better OCR accuracy."""
-        # Read the image
-        image = cv2.imread(self.image_path)
+        if self.image is None:
+            self.load_image()
 
-        # Convert the image to grayscale
+        image = cv2.cvtColor(np.array(self.image), cv2.COLOR_RGB2BGR)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        # Apply thresholding to binarize the image
+        # Use GaussianBlur to reduce noise and improve OCR results
+        gray = cv2.GaussianBlur(gray, (5, 5), 0)
         _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+
+        # Dilate to make text thicker
+        kernel = np.ones((3, 3), np.uint8)
+        thresh = cv2.dilate(thresh, kernel, iterations=1)
 
         return thresh
 
     def extract_text_from_image(self, image):
         """Extract text from the preprocessed image using Tesseract OCR."""
-        custom_config = r'--oem 3 --psm 6'  # Adjust PSM based on your receipt layout
+        custom_config = r'--oem 3 --psm 6'
         extracted_text = pytesseract.image_to_string(image, config=custom_config)
         return extracted_text
 
-    @staticmethod
-    def clean_price(price_str):
-        """Clean the price string and convert it to a float."""
-        # Remove any unwanted characters (e.g., multiple dots)
-        cleaned_str = re.sub(r'[^\d.]', '', price_str)  # Keep only digits and dots
-        if cleaned_str.count('.') > 1:  # If there are multiple dots, remove extra dots
-            cleaned_str = cleaned_str.replace('.', '', cleaned_str.count('.') - 1)
-
-        try:
-            return float(cleaned_str)
-        except ValueError:
-            return 0.0  # Fallback to 0.0 if conversion fails
-
     def parse_receipt_data(self, extracted_text):
-        """Parse the extracted text to identify vendor, date, items, and their prices."""
+        """Parse the extracted text to identify vendor, date, items, and total."""
         lines = extracted_text.split('\n')
         items = []
         vendor = None
         currency = None
         date = None
 
-        # Define regex patterns
-        date_pattern = re.compile(r'\b(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{1,2}[/-]\d{1,2})\b')  # Matches dates
-        currency_pattern = re.compile(r'(\$|€|¥|£)(\d+(?:\.\d{1,2})?)')  # Matches currency
+        # Improved regex pattern for date to match various formats
+        date_pattern = re.compile(
+            r'\b(\d{1,2}(?:[/-])\d{1,2}(?:[/-])\d{2,4}|\d{4}(?:[/-])\d{1,2}(?:[/-])\d{1,2}|'
+            r'\d{1,2} (?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|'
+            r'Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?) \d{4})\b',
+            re.IGNORECASE
+        )
 
-        exclude_keywords = [
-            'subtotal', 'total', 'cash', 'change', 'thank you', 'items', 'store', 'open',
-            'dallas', 'tx', 'thank', 'you', 'for', 'shopping'
-        ]
+        currency_pattern = re.compile(r'(\$|€|¥|£)(\d+(?:\.\d{1,2})?)')
 
         for line in lines:
-            line = line.strip()  # Remove leading/trailing whitespace
+            line = line.strip()
             if line:
                 # Set vendor as the first non-empty line
                 if vendor is None:
                     vendor = line
 
                 # Extract date
-                if date is None:
-                    date_match = date_pattern.search(line)
-                    if date_match:
-                        date = date_match.group(0)
+                date_match = date_pattern.search(line)
+                if date_match:
+                    date_str = date_match.group(0)
+                    date = self.convert_date_format(date_str)
 
-                # Extract currency and amount
+                    # Extract currency
                 currency_match = currency_pattern.search(line)
                 if currency_match:
-                    currency = currency_match.group(1)  # e.g., $
+                    currency = currency_match.group(1)
 
                 # Check if the line matches item patterns
-                # Use regex to capture items and prices
-                item_price_pattern = re.compile(r'([\w\s]+)\s+(\$|€|¥|£)?\s*([\d,.]+)')  # Matches item names and prices
+                item_price_pattern = re.compile(r'([\w\s]+)\s+(\$|€|¥|£)?\s*([\d,.]+)')
                 item_match = item_price_pattern.search(line)
 
                 if item_match:
                     item_name = item_match.group(1).strip()
-                    price = self.clean_price(item_match.group(3))  # Clean and convert the price
-                    items.append((item_name, price))  # Store items as tuples of (item_name, price)
+                    price_str = item_match.group(3)
 
-        amount = self.extract_total(extracted_text)
+                    # Debugging statement for the price string
+                    print(f"Extracted price string: '{price_str}'")  # Debugging line
+
+                    price = self.clean_price(price_str)  # Clean the price string
+                    items.append((item_name, price))
+
+        # Attempt to parse the date string into a date object
+
+
+        # Extract total amount using specific keyword
+        total_pattern = re.compile(r'TOTAL[:\s$€¥£]*([\d,]+(?:\.\d{1,2})?)')
+        total_match = total_pattern.search(extracted_text)
+        if total_match:
+            amount = self.clean_price(total_match.group(1))
+        else:
+            amount = None
+            print("Total amount not found in receipt data.")
+
+        # Categorize items
+        categorized_items = self.categorize_items(items)
 
         return {
             "vendor": vendor,
             "date": date,
             "currency": currency,
-            "items": items,
-            "amount":amount,
-            "description":'receipt data'
+            "items": categorized_items,
+            "amount": amount,
+            "description": 'receipt data'
         }
+
+    def clean_price(self, price_str):
+        """Remove commas and currency symbols, then convert to float. Defaults to 0.0 if empty or invalid."""
+        # Check if the price string is empty or None
+        if not price_str or price_str.strip() == '':
+            print("Warning: Empty price string received.")  # Debugging line
+            return 0.0
+
+        # Remove any commas, currency symbols, and strip whitespace
+        cleaned_str = price_str.replace(',', '').replace('$', '').strip()
+
+        try:
+            return float(cleaned_str)
+        except ValueError:
+            print(f"Warning: Could not convert '{cleaned_str}' to float.")  # Debugging line
+            return 0.0  # Default to 0.0 if conversion fails
+
 
     def extract_total(self, extracted_text):
         """Extract the total amount from the extracted text."""
@@ -106,20 +155,19 @@ class ReceiptReader:
         total_match = total_pattern.search(extracted_text)
 
         if total_match:
-            total = total_match.group(1) or total_match.group(3)  # Choose the correct group based on match
+            total = total_match.group(1) or total_match.group(3)
             if total:
-                total = total.replace("$", "").replace(" ", "").strip()  # Clean the total string
-                total = self.clean_price(total)  # Clean the total string
+                total = total.replace("$", "").replace(" ", "").strip()
+                total = self.clean_price(total)
             else:
-                total = 0.0  # Fallback to 0.0 if no match is found
+                total = 0.0
         else:
-            total = 0.0  # Fallback to 0.0 if no match is found
+            total = 0.0
 
         return total
 
     def categorize_item(self, item_name):
         """Categorize items into major categories."""
-        # Define major categories and keywords
         categories = {
             'Food': ['bread', 'apple', 'banana', 'chicken', 'beef', 'vegetable', 'fruit', 'pasta'],
             'Beverages': ['water', 'juice', 'soda', 'milk', 'coffee', 'tea', 'beer', 'wine'],
@@ -129,24 +177,48 @@ class ReceiptReader:
             'Health & Beauty': ['shampoo', 'soap', 'cream', 'toothpaste', 'vitamins'],
             'Office Supplies': ['paper', 'pen', 'pencil', 'notebook', 'stapler'],
             'Groceries': ['rice', 'beans', 'pasta', 'cereal', 'snack'],
-            'Others': []  # Placeholder for uncategorized items
+            'Others': []
         }
 
-        # Check the item name against categories
         for category, keywords in categories.items():
             if any(keyword in item_name.lower() for keyword in keywords):
                 return category
-        return 'Others'  # Return 'Others' if no category matched
+        return 'Others'
+
+    def convert_date_format(self, date_string):
+        possible_formats = [
+            '%m/%d/%Y',  # MM/DD/YYYY
+            '%d/%m/%Y',  # DD/MM/YYYY
+            '%Y-%m-%d',  # YYYY-MM-DD
+            '%m/%d/%y',  # MM/DD/YY
+            '%d/%m/%y',  # DD/MM/YY
+            '%d %B %Y',  # DD Month YYYY (e.g., 11 October 2024)
+            '%d %b %Y'  # DD Mon YYYY (e.g., 11 Oct 2024)
+        ]
+        for fmt in possible_formats:
+            try:
+                return datetime.strptime(date_string, fmt).strftime('%Y-%m-%d')
+            except ValueError:
+                continue
+        raise ValueError(f"Date format not recognized for date: {date_string}")
+
 
     def categorize_items(self, items):
         """Categorize all items into major categories."""
         categorized_items = {}
-        for item_name, price in items:
-            category = self.categorize_item(item_name)
-            if category in categorized_items:
-                categorized_items[category].append((item_name, price))
+
+        # Iterate through the dictionary items
+        for category, item_list in items:
+            # Check if item_list is indeed a list
+            if isinstance(item_list, list):
+                for item_name, price in item_list:  # Unpack each tuple
+                    # Get the category for the item
+                    item_category = self.categorize_item(item_name)
+                    # Use setdefault to categorize items
+                    categorized_items.setdefault(item_category, []).append((item_name, price))
             else:
-                categorized_items[category] = [(item_name, price)]
+                print(f"Expected a list but got {type(item_list)} in category: {category}")
+
         return categorized_items
 
     def get_main_category(self, categorized_items):
@@ -157,36 +229,29 @@ class ReceiptReader:
 
     def read_receipt(self):
         """Read the receipt and extract relevant information."""
-        # Preprocess the image
         preprocessed_image = self.preprocess_image()
-
-        # Extract text from the image
         extracted_text = self.extract_text_from_image(preprocessed_image)
         print("\nRaw Extracted Text:\n", extracted_text)
 
-        # Parse the extracted text to get vendor, date, currency, and items
         receipt_data = self.parse_receipt_data(extracted_text)
 
-        # Display the extracted data
         print("\nExtracted Receipt Data:")
         print(f"Vendor: {receipt_data['vendor']}")
         print(f"Date: {receipt_data['date']}")
         print(f"Currency: {receipt_data['currency']}")
 
-        print("\nExtracted Items with Prices:\n")
-        for item_name, price in receipt_data['items']:
-            print(f"{item_name}: {price}")
+        print("\nItems:")
+        for item in receipt_data['items']:
+            print(f"{item[0]}: ${item[1]:.2f}")
 
-        # Categorize items
+        print(f"\nTotal Amount: ${receipt_data['amount']:.2f}")
+
         categorized_items = self.categorize_items(receipt_data['items'])
-        print("\nCategorized Items:\n")
+        print("\nCategorized Items:")
         for category, items in categorized_items.items():
-            print(f"{category}: {items}")
+            print(f"{category}: {len(items)} item(s)")
 
-        # Get main category
         main_category = self.get_main_category(categorized_items)
-        print("\nMain Category:\n", main_category)
+        print(f"\nMain Category: {main_category}")
 
-        # Extract total
-        total = self.extract_total(extracted_text)
-        print("\nExtracted Total:\n", total)
+        return receipt_data

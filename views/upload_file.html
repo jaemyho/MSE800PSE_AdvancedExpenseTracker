@@ -3,14 +3,15 @@
 {% block content %}
 <!--<h2>{{ title }}</h2>-->
 <div class="horizontal_menu">
-    <a href="{{ url_for('add_expense') }}" class="{% if title == 'Add Expense' %}active{% endif %}">Add Expense</a>
-    <a href="{{ url_for('upload_file') }}"  class="{% if title == 'Receipt Expense' %}active{% endif %}">Scan Receipts</a>
-    <a href="{{ url_for('upload_bank_statement') }}"  class="{% if title == 'Bank Statement Expense' %}active{% endif %}">Scan Bank Statement</a>
+    <a href="{{ url_for('add_expense')}}" class="{% if title == 'Add Expense' %}active{% endif %}">Add Expense</a>
+    <a href="{{ url_for('upload_file')}}"  class="{% if title == 'Receipt Expense' %}active{% endif %}">Scan Receipts</a>
+    <a href="{{url_for('upload_bank_statement')}}"  class="{% if title == 'Bank_Statement_Expense' %}active{% endif %}">Scan Bank Statement</a>
 </div>
 
 <div class="upload_folder">
-    <h3>Upload {{title}}</h3>
-    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+    <form action="{% if title == 'Receipt Expense' %}{{ url_for('upload_file') }}{% elif title == 'Bank_Statement_Expense' %}{{ url_for('upload_bank_statement') }}{% endif %}"
+          enctype="multipart/form-data"
+          method="post">
         <input type="file" name="file">
         <input type="submit" value="Upload">
     </form>
