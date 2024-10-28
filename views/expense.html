@@ -21,7 +21,7 @@
     {% elif title == 'Delete Expense' %}
     {{ url_for('delete_expense', expense_id=expense.id) }}
     {% elif title == 'Receipt Expense' %}
-    {{ url_for('upload_file') }}
+    {{ url_for('submit_expense') }}
     {% elif title == 'Bank Statement Expense' %}
     {{ url_for('upload_bank_statement') }}
     {% else %}

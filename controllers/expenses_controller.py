@@ -198,17 +198,33 @@ class ExpenseController:
 
             category = receipt_reader.get_main_category(categorized_items)
             amount = receipt_reader.extract_total(extracted_text)
-            description = "Scanned Receipt"
+            description =  "Scanned Receipt"
             receipt = 1
-            self.expenses_model.add_expense(vendor, category, description, currency, amount, date, receipt)
-
             # Pass data to the template
             return render_template('expense.html', title='Receipt Expense', items=items, total=amount,
                                    expense=receipt_details, currencies=currencies, categories=categories)
             flash("Uploaded successful!.", "success")
 
             # Render the upload form for GET requests
-        return render_template('upload_file.html',title='Receipt Expense')
+        return render_template('upload_file.html',title='Receipt Upload')
+
+    def add_expenses_to_db(self):
+        if request.method == 'POST':
+            vendor = request.form['vendor']
+            category = request.form['category']
+            description = request.form['description']
+            currency = request.form['currency']
+            amount = request.form['amount']
+            date = request.form['expense_date']
+            receipt = 1  # Assuming you have a receipt ID or similar mechanism
+
+            # Add the expense to the database
+            self.expenses_model.add_expense(vendor, category, description, currency, amount, date, receipt)
+            flash("Expense submitted successfully!", "success")
+
+            # Redirect to a desired route after successful submission
+            return redirect(url_for('upload_file'))  # Change to the route you want to go after submission
+
 
 
     def get_bank_statement_data(self):

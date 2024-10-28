@@ -67,6 +67,11 @@ def delete_expense(expense_id):
 def upload_file():
     return expense_controller.get_receipt_data()
 
+@app.route('/submit_expense', methods=['POST'])
+def submit_expense():
+    # Handle the form submission from expense.html
+   return  expense_controller.add_expenses_to_db()
+
 @app.route('/expenses/upload_bank_statement', methods=['GET', 'POST'])
 @login_required
 def upload_bank_statement():
