@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, flash
 from models.expenses_model import ExpensesModel
 from file_upload_handler import FileUploadHandler
 from receipt_reader import ReceiptReader
@@ -182,6 +182,7 @@ class ExpenseController:
             receipt_reader = ReceiptReader(filepath)
             preprocessed_image = receipt_reader.preprocess_image()
             extracted_text = receipt_reader.extract_text_from_image(preprocessed_image)
+            print("extracted_text", extracted_text)
             receipt_details = receipt_reader.parse_receipt_data(extracted_text)
 
             vendor = receipt_details['vendor']
@@ -220,25 +221,35 @@ class ExpenseController:
             # Create an instance of BankStatementReader
             bank_reader = BankStatementReader(self.app.config['UPLOAD_FOLDER'])
             # Extract text from the uploaded bank statement
-            bank_statement_data = bank_reader.extract_text_from_file(filepath)
-            parsed_data = bank_reader.parse_bank_statement(bank_statement_data)
+            extracted_bank_statement_data = bank_reader.extract_text_from_file(filepath)
+            parsed_bank_statement_data = bank_reader.parse_bank_statement(extracted_bank_statement_data)
+            print("parsed_data", parsed_bank_statement_data)
 
             # Logic to compare transactions with stored receipts in the database
-            matched_receipts = self.compare_transactions(parsed_data['transactions'])  # Implement this function
+            matched_receipts = self.compare_transactions(parsed_bank_statement_data)  # Implement this function
+            if matched_receipts:
+                flash("Matching receipts found!", "success")
+            else:
+                flash("No matching receipts found.", "info")
 
-            return render_template('results.html', parsed_data=parsed_data, matched_receipts=matched_receipts)
+            print("matched_receipts", matched_receipts)
+
+            return render_template('upload_file.html', parsed_data=parsed_bank_statement_data, matched_receipts=matched_receipts)
 
         return render_template('upload_file.html',title='Bank Statement Expense')
 
-    def compare_transactions(self,transactions):
+    def compare_transactions(self,bank_statement_data):
         """Implement logic to compare transactions with stored receipts."""
+        start_date = bank_statement_data['start_date']
+        end_date = bank_statement_data['end_date']
 
-        receipts = self.expenses_model.get_all_expense()  # Adjust this according to your method
+        receipts_total = self.expenses_model.get_total_expenses_from_bank_statement_by_start_and_end_date(start_date,end_date)
+        print("receipts_total", receipts_total)
+        bank_statement_total  = bank_statement_data['total_payment']
+        if receipts_total != bank_statement_total:
+            return False
+        else:
+            return True
 
-        matched_receipts = []
-        for transaction in transactions:
-            for receipt in receipts:
-                if transaction['amount'] == receipt['amount'] and transaction['description'] in receipt['description']:
-                    matched_receipts.append({'transaction': transaction, 'receipt': receipt})
 
-        return matched_receipts
+        # return matched_receipts

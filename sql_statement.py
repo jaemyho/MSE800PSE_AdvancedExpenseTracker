@@ -182,6 +182,7 @@ GET_EXPENSE_GROUP_BY_CATEGORY = (f"SELECT cat.category, COALESCE(SUM(exp.amount)
                                  f"ON exp.category_id = cat.id AND exp.company_id = %s ")
 GET_USER_BY_USERNAME = f"SELECT * FROM AET_users WHERE username = %s"
 GET_USER_BY_USERNAME_OR_EMAIL = f"SELECT * FROM {USER_TABLE} WHERE username = %s OR email = %s"
+GET_TOTAL_EXPENSES_BY_START_DATE_AND_END_DATE = f"SELECT SUM(amount) AS total_expense FROM AET_expense WHERE date BETWEEN  %s AND  %s "
 
 #INSERT SCRIPT
 ADD_NEW_USER = f"INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number, company_id, role_id) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)"

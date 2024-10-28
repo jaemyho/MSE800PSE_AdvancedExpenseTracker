@@ -190,3 +190,15 @@ class ExpensesModel:
         except Exception as e:
             print(f"Get Daily Total Expense Group By Date Error : {e}")
             return ()
+
+    def get_total_expenses_from_bank_statement_by_start_and_end_date(self,start_date,end_date):
+        try:
+            cur = self.mysql.connection.cursor()
+            cur.execute(GET_TOTAL_EXPENSES_BY_START_DATE_AND_END_DATE, (start_date,end_date))
+            self.mysql.connection.commit()
+            expenses = cur.fetchall()
+            cur.close()
+            return expenses
+        except Exception as e:
+            print(f"Get All Expense Error : {e}")
+            return ()

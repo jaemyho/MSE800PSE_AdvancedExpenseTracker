@@ -83,20 +83,34 @@ class BankStatementReader:
             transaction_parts = line.split()
             if len(transaction_parts) > 2:
                 try:
-                    date_str = transaction_parts[0]  # Assuming date is the first element
+                    # Assuming the date is the first element and formatted as 'DD Month YYYY'
+                    date_str = transaction_parts[0] + " " + transaction_parts[1] + " " + transaction_parts[2]
                     amount_str = transaction_parts[-1]  # Assuming amount is the last element
                     amount = float(amount_str.replace(',', '').replace('$', ''))  # Adjust according to currency format
                     total_payment += amount
-                    transaction_date = datetime.strptime(date_str, '%Y-%m-%d')  # Adjust date format if necessary
+                    # Attempt to parse the transaction date
+                    transaction_date = datetime.strptime(date_str, '%d %B %Y')  # Adjust date format if necessary
+
+                    # Append transaction
                     transactions.append({'date': transaction_date, 'amount': amount})
+
+                    # Determine start and end dates
+                    if start_date is None or transaction_date < start_date:
+                        start_date = transaction_date
+                    if end_date is None or transaction_date > end_date:
+                        end_date = transaction_date
+
+
                 except ValueError:
                     continue  # Handle parsing error
-
+            # Format start_date and end_date to remove time
+        start_date_str = start_date.strftime('%Y-%m-%d') if start_date else None
+        end_date_str = end_date.strftime('%Y-%m-%d') if end_date else None
         return {
             'transactions': transactions,
             'total_payment': total_payment,
-            'start_date': start_date,
-            'end_date': end_date,
+            'start_date': start_date_str,
+            'end_date': end_date_str,
             'customer_first_name': customer_first_name,
             'customer_last_name': customer_last_name,
             'currency': currency,
@@ -106,7 +120,7 @@ class BankStatementReader:
 
 def view_details():
     # Get file path input from user
-    file_path =  'images/bank.'
+    file_path =  'uploads/invoice_1.pdf'
 
     # Ensure the file exists
     if not os.path.exists(file_path):
