@@ -251,7 +251,7 @@ class ReceiptReader:
 
         # Join the first few relevant lines to form the description
         description = ' '.join(description_lines[:3])  # Adjust the number as needed for a concise description
-        return description.strip()
+        return description.replace(",", "").strip()
 
     def extract_shop_name(self,extracted_text):
         # This method does not take any parameters, it uses self.receipt_text
