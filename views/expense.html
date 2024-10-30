@@ -41,9 +41,9 @@
             {% endfor %}
         </select><br><br>
 
-        <!-- Description Input -->
+        <!-- Description I  nput -->
         <label for="description" style="display: block; margin-bottom: 5px;">Description:</label>
-        <textarea id="description" name="description" placeholder="Enter Description"  {% if title == 'Delete Expense' %}disabled{% endif %} required style="height: 100px; width: 400px;" >{{ expense.description if expense and expense.description else '' }}</textarea><br><br>
+        <textarea id="description" name="description" placeholder="Enter Description"  {% if title == 'Delete Expense' %}disabled{% endif %} required style="height: 100px; width: 400px;" >{{ description if expense and description else '' }}</textarea><br><br>
 
         <!-- Amount Input -->
         <label for="amount">Amount:</label>

@@ -169,20 +169,30 @@ class ReceiptReader:
     def categorize_item(self, item_name):
         """Categorize items into major categories."""
         categories = {
-            'Food': ['bread', 'apple', 'banana', 'chicken', 'beef', 'vegetable', 'fruit', 'pasta'],
-            'Beverages': ['water', 'juice', 'soda', 'milk', 'coffee', 'tea', 'beer', 'wine'],
-            'Household': ['detergent', 'soap', 'cleaner', 'paper towels', 'trash bags'],
-            'Electronics': ['phone', 'charger', 'battery', 'cable', 'headphones', 'speaker'],
-            'Clothing': ['shirt', 'pants', 'dress', 'shoes', 'socks', 'jacket'],
-            'Health & Beauty': ['shampoo', 'soap', 'cream', 'toothpaste', 'vitamins'],
-            'Office Supplies': ['paper', 'pen', 'pencil', 'notebook', 'stapler'],
-            'Groceries': ['rice', 'beans', 'pasta', 'cereal', 'snack'],
-            'Others': []
+            'Food': ['food', 'meal', 'dinner', 'lunch', 'breakfast'],
+            'Groceries': ['grocery', 'supermarket', 'market', 'food store'],
+            'Entertainment': ['movie', 'concert', 'show', 'theater', 'entertainment'],
+            'Subscriptions': ['subscription', 'monthly', 'annual fee', 'service'],
+            'Rental': ['rental', 'lease', 'rent'],
+            'Tax': ['tax', 'taxes', 'tax preparation'],
+            'Insurance': ['insurance', 'policy', 'coverage'],
+            'Medical': ['doctor', 'medical', 'health', 'pharmacy'],
+            'Education': ['tuition', 'class', 'course', 'school'],
+            'Investments': ['investment', 'stocks', 'bonds'],
+            'Transportation': ['transportation', 'taxi', 'bus', 'train', 'uber'],
+            'Accommodation': ['hotel', 'motel', 'stay', 'lodging'],
+            'Clothings': ['clothing', 'apparel', 'fashion', 'shoes', 'wear'],
+            'Events': ['event', 'conference', 'meeting', 'gathering'],
         }
 
-        for category, keywords in categories.items():
-            if any(keyword in item_name.lower() for keyword in keywords):
-                return category
+        if isinstance(item_name, str):
+            item_name = item_name.lower()
+            for category, keywords in categories.items():
+                if any(keyword in item_name for keyword in keywords):
+                    return category
+        else:
+            print("Item name is not a string:", item_name)
+
         return 'Others'
 
     def convert_date_format(self, date_string):
@@ -227,7 +237,54 @@ class ReceiptReader:
         main_category = category_counts.most_common(1)[0][0] if category_counts else 'Others'
         return main_category
 
-    def read_receipt(self):
+    def extract_description(self, extracted_text):
+        """Extract a short description from the extracted text."""
+        # Split the extracted text into lines
+        lines = extracted_text.split('\n')
+        description_lines = []
+
+        # Iterate through the lines to find the most relevant descriptions
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith(('TOTAL', 'DATE', 'TIME', 'VENDOR', 'ITEMS')):  # Filter out header lines
+                description_lines.append(line)
+
+        # Join the first few relevant lines to form the description
+        description = ' '.join(description_lines[:3])  # Adjust the number as needed for a concise description
+        return description.strip()
+
+    def extract_shop_name(self,extracted_text):
+        # This method does not take any parameters, it uses self.receipt_text
+        shop_name_pattern = r'^[^\d]+'  # Match from the start of the string until a number is encountered
+        match = re.search(shop_name_pattern,extracted_text)
+        return match.group(0).strip() if match else 'Unknown'
+
+    def get_category_from_receipt(self,extracted_text):
+        categories = {
+            'Food': r'\b(food|meal|dinner|lunch|breakfast|cafe|restaurant|bar|coffee|snack|breakfast)\b',
+            'Groceries': r'\b(grocery|supermarket|market|produce|food store|shop|groceries)\b',
+            'Entertainment': r'\b(movie|concert|show|theater|entertainment|event|game)\b',
+            'Subscriptions': r'\b(subscription|monthly|annual|service|membership)\b',
+            'Rental': r'\b(rental|lease|rent|hire)\b',
+            'Tax': r'\b(tax|taxes|tax preparation|filing)\b',
+            'Insurance': r'\b(insurance|policy|coverage|premium)\b',
+            'Medical': r'\b(doctor|medical|health|pharmacy|hospital|clinic)\b',
+            'Education': r'\b(tuition|class|course|school|college|university)\b',
+            'Investments': r'\b(investment|stocks|bonds|fund)\b',
+            'Transportation': r'\b(transportation|taxi|bus|train|fare|uber|lyft|travel)\b',
+            'Accommodation': r'\b(hotel|motel|stay|lodging|resort|inn)\b',
+            'Clothing': r'\b(clothing|apparel|fashion|shoes|wear|attire)\b',
+            'Events': r'\b(event|conference|meeting|gathering|celebration)\b',
+        }
+
+        # Check each category with regex
+        for category, pattern in categories.items():
+            if re.search(pattern, extracted_text):
+                return category  # Return the first matching category
+
+        return 'Others'  # Default category if no match is found
+
+    def read_receipt(self,extracted_text):
         """Read the receipt and extract relevant information."""
         preprocessed_image = self.preprocess_image()
         extracted_text = self.extract_text_from_image(preprocessed_image)
@@ -235,10 +292,14 @@ class ReceiptReader:
 
         receipt_data = self.parse_receipt_data(extracted_text)
 
+        # Extract the description
+        description = self.extract_description(extracted_text)
+
         print("\nExtracted Receipt Data:")
         print(f"Vendor: {receipt_data['vendor']}")
         print(f"Date: {receipt_data['date']}")
         print(f"Currency: {receipt_data['currency']}")
+        print(f"Description: {description}")  # Display the extracted description
 
         print("\nItems:")
         for item in receipt_data['items']:
@@ -255,3 +316,40 @@ class ReceiptReader:
         print(f"\nMain Category: {main_category}")
 
         return receipt_data
+
+    # def read_receipt(self):
+    #     """Read the receipt and extract relevant information."""
+    #     preprocessed_image = self.preprocess_image()
+    #     extracted_text = self.extract_text_from_image(preprocessed_image)
+    #     print("\nRaw Extracted Text:\n", extracted_text)
+    #
+    #     receipt_data = self.parse_receipt_data(extracted_text)
+    #
+    #     print("\nExtracted Receipt Data:")
+    #     print(f"Vendor: {receipt_data['vendor']}")
+    #     print(f"Date: {receipt_data['date']}")
+    #     print(f"Currency: {receipt_data['currency']}")
+    #
+    #     print("\nItems:")
+    #     for item in receipt_data['items']:
+    #         print(f"{item[0]}: ${item[1]:.2f}")
+    #
+    #     print(f"\nTotal Amount: ${receipt_data['amount']:.2f}")
+    #
+    #     categorized_items = self.categorize_items(receipt_data['items'])
+    #     print("\nCategorized Items:")
+    #     for category, items in categorized_items.items():
+    #         print(f"{category}: {len(items)} item(s)")
+    #
+    #     main_category = self.get_main_category(categorized_items)
+    #     print(f"\nMain Category: {main_category}")
+    #
+    #     return receipt_data
+
+
+    def extract_items(self,receipt_text):
+        # Extract items from the receipt
+        item_pattern = r'([A-Za-z\s]+)\s+(\d+)\s+\$(\d+(\.\d{2})?)\s+\$(\d+(\.\d{2})?)'
+        items = re.findall(item_pattern, receipt_text)
+        return [(item[0].strip(), int(item[1]), float(item[2]), float(item[4])) for item in items]
+

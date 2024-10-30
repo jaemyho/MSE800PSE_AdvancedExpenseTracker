@@ -164,7 +164,7 @@ GET_DAILY_TOTAL_EXPENSE = (f"SELECT DATE(date) AS day, SUM(amount) AS total_amou
 GET_ALL_EXPENSES = (f"SELECT exp.*, usr.username as user, curr.code as currency, cat.category as category FROM {EXPENSE_TABLE} as exp "
                     f"LEFT JOIN {USER_TABLE} as usr ON exp.user_id = usr.id "
                     f"LEFT JOIN {CURRENCY_TABLE} as curr ON exp.currency_id = curr.id "
-                    f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id WHERE exp.company_id = %s;")
+                    f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id WHERE exp.company_id = %s")
 GET_EXPENSE_BY_ID = f"SELECT * FROM {EXPENSE_TABLE} WHERE id = %s and company_id = %s;"
 GET_ALL_AUDITLOG = f"SELECT al.*, us.username FROM {AUDITLOG_TABLE} as al LEFT JOIN {USER_TABLE} as us on al.user = us.id WHERE al.company_id = %s"
 GET_ALL_CURRENCIES = f"SELECT * FROM {CURRENCY_TABLE};"
@@ -184,7 +184,7 @@ GET_USER_BY_USERNAME = f"SELECT * FROM AET_users WHERE username = %s"
 GET_USER_BY_USERNAME_OR_EMAIL = f"SELECT * FROM {USER_TABLE} WHERE username = %s OR email = %s"
 GET_TOTAL_EXPENSES_BY_START_DATE_AND_END_DATE = f"SELECT SUM(amount) AS total_expense FROM AET_expense WHERE date BETWEEN  %s AND  %s "
 GET_BANK_STATEMENT_STATUS_BY_DATE_AND_DEBIT_AMOUNT = "SELECT bank_statement FROM AET_expense WHERE date = %s AND amount = %s LIMIT 1"
-
+GET_CATEGORY_NAME = f"SELECT id FROM {CATEGORY_TABLE} WHERE category = %s"
 #INSERT SCRIPT
 ADD_NEW_USER = f"INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number, company_id, role_id) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)"
 ADD_AUDITLOG = f"INSERT INTO {AUDITLOG_TABLE} (type, user, company_id, insert_date, function_name, table_name, sql_statement, record) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"

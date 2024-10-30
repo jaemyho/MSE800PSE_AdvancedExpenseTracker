@@ -135,9 +135,6 @@ class ExpenseController:
             start_date = request.form['search_start']
             end_date = request.form['search_end']
 
-            sql = sql[:-1]  # removing character ";" at the end
-            sql += " WHERE 1=1"
-
             if type == "weekly":
                 sql += EXPENSE_FILTER_THIS_WEEK
             elif type == "monthly":
@@ -149,8 +146,15 @@ class ExpenseController:
             if end_date != "":
                 sql += " AND date <= '" + end_date + "'"
 
-            sql += ";"
+        sql += ORDER_BY_DATE + " DESC"
         expenses = self.expenses_model.get_all_expense(sql)
+
+        # Update bank_statement values
+        for record in expenses:
+            if record['bank_statement'] == 0:
+                record['bank_statement'] = 'unmatched'
+            elif record['bank_statement'] == 1:
+                record['bank_statement'] = 'matched'
 
         if(expenses != ()):
             # Creating a DataFrame
@@ -163,8 +167,8 @@ class ExpenseController:
         data = {
             'expenses' : expenses,
             'serach_type' : type,
-            'start_date' : start_date,
-            'end_date' : end_date,
+            'search_start' : start_date,
+            'search_end' : end_date,
             'grouped_dict_category' : grouped_dict_category
         }
 
@@ -188,7 +192,8 @@ class ExpenseController:
             print("extracted_text", extracted_text)
             receipt_details = receipt_reader.parse_receipt_data(extracted_text)
 
-            vendor = receipt_details['vendor']
+            vendor = receipt_reader.extract_shop_name(extracted_text)
+            print("vendor", vendor)
             # converting date into the YYYY-MM-DD format
             date = receipt_details['date']  # initial 'MM/DD/YYYY' format
             print("date", date)
@@ -199,13 +204,18 @@ class ExpenseController:
             categorized_items = receipt_reader.categorize_items(items)
             print("categorized_items", categorized_items)
 
-            category = receipt_reader.get_main_category(categorized_items)
+            category = receipt_reader.get_category_from_receipt(extracted_text)
+            category_id = self.expenses_model.get_category_id(category)
+            print("category", category)
+            print("category_id", category_id)
             amount = receipt_reader.extract_total(extracted_text)
-            description =  "Scanned Receipt"
+            description = receipt_reader.extract_description(extracted_text)
+            receipt_details['description'] = description
+            print("description", description)
             receipt = 1
             # Pass data to the template
             return render_template('expense.html', title='Receipt Expense', items=items, total=amount,
-                                   expense=receipt_details, currencies=currencies, categories=categories)
+                                   expense=receipt_details, currencies=currencies, categories=categories,category=category)
             flash("Uploaded successful!.", "success")
 
             # Render the upload form for GET requests
@@ -241,6 +251,7 @@ class ExpenseController:
             extracted_bank_statement_data = bank_reader.extract_text_from_file(filepath)
             parsed_bank_statement_transactions = bank_reader.extract_transactions(extracted_bank_statement_data)
             print("parsed_data", parsed_bank_statement_transactions)
+
             for transaction in parsed_bank_statement_transactions:
                 print("transaction new", transaction['Date'])
                 self.expenses_model.update_bank_statement_matched_status(transaction['Date'], transaction['Debit'])

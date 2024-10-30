@@ -225,3 +225,15 @@ class ExpensesModel:
         except Exception as e:
             print(f"Get All Expense Error : {e}")
             return ()
+
+    def get_category_id(self,category_name):
+        try:
+            cur = self.mysql.connection.cursor()
+            cur.execute(GET_CATEGORY_NAME, (category_name))
+            self.mysql.connection.commit()
+            cat_id = cur.fetchall()
+            cur.close()
+            return cat_id
+        except Exception as e:
+            print(f"Get All Expense Error : {e}")
+            return ()
