@@ -9,9 +9,9 @@
         <div style="margin-top:auto;margin-bottom:auto;">
             <label for="search_type">Type:</label>
             <select id="search_type" name="search_type"  required>
-                <option value="week" {% if search_type == 'week' %}selected{% endif %} >Weekly</option>
-                <option value="month" {% if search_type == 'month' %}selected{% endif %} >Monthly</option>
-                <option value="year" {% if search_type == 'year' %}selected{% endif %} >Annually</option>
+                <option value="week" {% if search_type == 'week' %}selected{% endif %} >This Week</option>
+                <option value="month" {% if search_type == 'month' %}selected{% endif %} >This Month</option>
+                <option value="year" {% if search_type == 'year' %}selected{% endif %} >This Year</option>
             </select>
           <input type="submit" value="Search">
         </div>
@@ -47,7 +47,7 @@
   <div class="summary">
     <!-- Monthly Summary Bar Chart -->
     <div class="chart-container">
-        <div class="chart-title">Monthly Summary</div>
+        <div class="chart-title">This {{ search_type | capitalize }} Summary</div>
         <canvas id="monthlyChart" width="600" height="400"></canvas>
     </div>
 
