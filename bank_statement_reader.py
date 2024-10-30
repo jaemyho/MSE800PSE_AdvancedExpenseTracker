@@ -1,4 +1,6 @@
 import os
+import re
+
 import fitz  # PyMuPDF
 import pytesseract
 from PIL import Image
@@ -33,94 +35,94 @@ class BankStatementReader:
         else:
             raise ValueError(f"Unsupported file type: {file_extension}")
 
-    def parse_bank_statement(self, text):
-        """Parse the bank statement text and extract relevant details."""
-        transactions = []
-        lines = text.splitlines()
+    # Function to extract transactions
+    def extract_transactions(self, statement):
+        # Split the statement into lines
+        lines = statement.strip().split('\n')
 
-        # Initialize variables to extract other required details
-        start_date = None
-        end_date = None
-        customer_first_name = None
-        customer_last_name = None
-        currency = None
-        bank_name = None
-        total_payment = 0.0
+        # Temporary storage for transaction parts and final transaction list
+        transaction_lines = []
+        transactions = []
+
+        # Helper function to check if the beginning of a line is a valid date
+        def is_date(line):
+            parts = line.split()
+            if len(parts) >= 3:
+                try:
+                    datetime.strptime(" ".join(parts[:3]), "%d %B %Y")
+                    return True
+                except ValueError:
+                    return False
+            return False
 
         for line in lines:
-            if 'Account Holder' in line:
-                # Extract customer names from line
-                parts = line.split(':')
-                if len(parts) > 1:
-                    customer_full_name = parts[1].strip()
-                    customer_first_name, customer_last_name = customer_full_name.split(' ', 1)
+            # Stop if we reach the end marker
+            if "--- End of Transactions ---" in line:
+                break
 
-            if 'Bank Name' in line:
-                # Extract bank name from line
-                parts = line.split(':')
-                if len(parts) > 1:
-                    bank_name = parts[1].strip()
+            # Check if line starts with a date
+            if is_date(line):
+                # Process previous transaction if exists
+                if transaction_lines:
+                    self.process_transaction(transaction_lines, transactions)
+                    transaction_lines = []
 
-            if 'Currency' in line:
-                # Extract currency from line
-                parts = line.split(':')
-                if len(parts) > 1:
-                    currency = parts[1].strip()
+            # Accumulate lines for current transaction
+            transaction_lines.append(line)
 
-            if 'Start Date' in line:
-                # Extract start date from line
-                parts = line.split(':')
-                if len(parts) > 1:
-                    start_date = datetime.strptime(parts[1].strip(), '%Y-%m-%d')  # Adjust date format if necessary
+        # Process the last accumulated transaction
+        if transaction_lines:
+            self.process_transaction(transaction_lines, transactions)
 
-            if 'End Date' in line:
-                # Extract end date from line
-                parts = line.split(':')
-                if len(parts) > 1:
-                    end_date = datetime.strptime(parts[1].strip(), '%Y-%m-%d')  # Adjust date format if necessary
+        print("transactions", transactions)
 
-            # Assuming each transaction has a date and an amount, adjust according to your expected format
-            transaction_parts = line.split()
-            if len(transaction_parts) > 2:
-                try:
-                    # Assuming the date is the first element and formatted as 'DD Month YYYY'
-                    date_str = transaction_parts[0] + " " + transaction_parts[1] + " " + transaction_parts[2]
-                    amount_str = transaction_parts[-1]  # Assuming amount is the last element
-                    amount = float(amount_str.replace(',', '').replace('$', ''))  # Adjust according to currency format
-                    total_payment += amount
-                    # Attempt to parse the transaction date
-                    transaction_date = datetime.strptime(date_str, '%d %B %Y')  # Adjust date format if necessary
+        return transactions
 
-                    # Append transaction
-                    transactions.append({'date': transaction_date, 'amount': amount})
+    def process_transaction(self, lines, transactions):
+        # Join lines for each transaction
+        transaction_text = " ".join(lines)
+        parts = list(filter(None, transaction_text.split()))
 
-                    # Determine start and end dates
-                    if start_date is None or transaction_date < start_date:
-                        start_date = transaction_date
-                    if end_date is None or transaction_date > end_date:
-                        end_date = transaction_date
+        if len(parts) < 5:
+            # Skip incomplete transactions without printing a message
+            return
 
+        try:
+            # Extract date
+            date = datetime.strptime(" ".join(parts[:3]), "%d %B %Y").date()
 
-                except ValueError:
-                    continue  # Handle parsing error
-            # Format start_date and end_date to remove time
-        start_date_str = start_date.strftime('%Y-%m-%d') if start_date else None
-        end_date_str = end_date.strftime('%Y-%m-%d') if end_date else None
-        return {
-            'transactions': transactions,
-            'total_payment': total_payment,
-            'start_date': start_date_str,
-            'end_date': end_date_str,
-            'customer_first_name': customer_first_name,
-            'customer_last_name': customer_last_name,
-            'currency': currency,
-            'bank_name': bank_name
-        }
+            # Find the balance and debit fields by working from the end
+            balance = float(parts[-1].replace(",", ""))
+            debit_parts = []
+            for part in reversed(parts[:-1]):
+                if part.replace(",", "").replace(".", "").isdigit():
+                    debit_parts.insert(0, part)
+                else:
+                    break
+
+            # Create debit value and remove .0 if applicable
+            debit = float("".join(debit_parts).replace(",", ""))
+            debit = int(debit) if debit.is_integer() else debit  # Convert to int if it is a whole number
+
+            # Extract description
+            description = " ".join(parts[3:len(parts) - len(debit_parts) - 1])
+
+            # Append the parsed transaction
+            transactions.append({
+                "Date": date,
+                "Description": description,
+                "Debit": debit,
+                "Balance": balance
+            })
+
+        except ValueError:
+            # Instead of printing, just skip the transaction
+            return
 
 
 def view_details():
     # Get file path input from user
-    file_path =  'uploads/invoice_1.pdf'
+    file_path = 'uploads/invoice_1.pdf'
 
     # Ensure the file exists
     if not os.path.exists(file_path):
@@ -133,20 +135,20 @@ def view_details():
     try:
         # Extract text from the file
         extracted_text = reader.extract_text_from_file(file_path)
+        print(extracted_text)
 
-        # Parse the extracted text
-        parsed_data = reader.parse_bank_statement(extracted_text)
+        # Extract transactions from the statement data
+        try:
+            parsed_transactions = reader.extract_transactions(extracted_text)
+            print("parsed_transactions",parsed_transactions)
 
-        # Display the parsed information
-        print("\nParsed Bank Statement Data:")
-        print(f"Customer Name: {parsed_data['customer_first_name']} {parsed_data['customer_last_name']}")
-        print(f"Bank Name: {parsed_data['bank_name']}")
-        print(f"Currency: {parsed_data['currency']}")
-        print(f"Statement Period: {parsed_data['start_date']} to {parsed_data['end_date']}")
-        print(f"Total Payment: {parsed_data['total_payment']}")
-        print("\nTransactions:")
-        for transaction in parsed_data['transactions']:
-            print(f"- Date: {transaction['date']}, Amount: {transaction['amount']}")
+            # Print the extracted transactions
+            print("\nExtracted Transactions:")
+            for transaction in parsed_transactions:
+                print(transaction)
+
+        except ValueError as e:
+            print(e)
 
     except ValueError as ve:
         print(f"Error: {ve}")
@@ -154,5 +156,8 @@ def view_details():
         print(f"An error occurred: {e}")
 
 
+
+
 if __name__ == "__main__":
+
     view_details()

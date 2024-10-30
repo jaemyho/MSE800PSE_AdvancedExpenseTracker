@@ -228,8 +228,6 @@ class ExpenseController:
             # Redirect to a desired route after successful submission
             return redirect(url_for('upload_file'))  # Change to the route you want to go after submission
 
-
-
     def get_bank_statement_data(self):
         if request.method == 'POST':
             upload_handler = FileUploadHandler(request, self.app.config['UPLOAD_FOLDER'])
@@ -241,34 +239,32 @@ class ExpenseController:
             bank_reader = BankStatementReader(self.app.config['UPLOAD_FOLDER'])
             # Extract text from the uploaded bank statement
             extracted_bank_statement_data = bank_reader.extract_text_from_file(filepath)
-            parsed_bank_statement_data = bank_reader.parse_bank_statement(extracted_bank_statement_data)
-            print("parsed_data", parsed_bank_statement_data)
+            parsed_bank_statement_transactions = bank_reader.extract_transactions(extracted_bank_statement_data)
+            print("parsed_data", parsed_bank_statement_transactions)
+            for transaction in parsed_bank_statement_transactions:
+                print("transaction new", transaction['Date'])
+                self.expenses_model.update_bank_statement_matched_status(transaction['Date'], transaction['Debit'])
+                bank_statement_status = self.expenses_model.get_bank_statement_status_by_date_and_debit_amount(
+                    transaction['Date'], transaction['Debit'])
 
-            # Logic to compare transactions with stored receipts in the database
-            matched_receipts = self.compare_transactions(parsed_bank_statement_data)  # Implement this function
-            if matched_receipts:
-                flash("Matching receipts found!", "success")
-            else:
-                flash("No matching receipts found.", "info")
+                if bank_statement_status:
+                    # Access the first element of the tuple
+                    status_dict = bank_statement_status[0]
+                    # Check the 'bank_statement' key
+                    if 'bank_statement' in status_dict:
+                        if status_dict['bank_statement'] == 1:
+                            transaction['Status'] = "matched"
+                        else:
+                            transaction['Status'] = "unmatched"
+                    else:
+                        transaction['Status'] = "Status key not found"
+                else:
+                    transaction['Status'] = "Unmatched"
 
-            print("matched_receipts", matched_receipts)
+            print("final parsed_bank_statement_transactions", parsed_bank_statement_transactions)
 
-            return render_template('upload_file.html', parsed_data=parsed_bank_statement_data, matched_receipts=matched_receipts)
+            return render_template('upload_file.html', transactions=parsed_bank_statement_transactions)
 
-        return render_template('upload_file.html',title='Bank Statement Expense')
-
-    def compare_transactions(self,bank_statement_data):
-        """Implement logic to compare transactions with stored receipts."""
-        start_date = bank_statement_data['start_date']
-        end_date = bank_statement_data['end_date']
-
-        receipts_total = self.expenses_model.get_total_expenses_from_bank_statement_by_start_and_end_date(start_date,end_date)
-        print("receipts_total", receipts_total)
-        bank_statement_total  = bank_statement_data['total_payment']
-        if receipts_total != bank_statement_total:
-            return False
-        else:
-            return True
+        return render_template('upload_file.html', title='Bank Statement Expense')
 
 
-        # return matched_receipts

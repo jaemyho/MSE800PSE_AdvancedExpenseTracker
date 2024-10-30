@@ -202,3 +202,26 @@ class ExpensesModel:
         except Exception as e:
             print(f"Get All Expense Error : {e}")
             return ()
+
+    def update_bank_statement_matched_status(self,date,debit_amount):
+        try:
+            values = (date, debit_amount)
+            cur = self.mysql.connection.cursor()
+            cur.execute(UPDATE_BANK_STATEMENT_MATCHED_STATUS_IN_EXPENSES, values)
+            self.mysql.connection.commit()
+            cur.close()
+            # self.auditlog.add_auditlog("update_expense", UPDATE_BANK_STATEMENT_MATCHED_STATUS_IN_EXPENSES % values, str(previous_expense))
+        except Exception as e:
+            print(f"Expenses Update Expense Error : {e}")
+
+    def get_bank_statement_status_by_date_and_debit_amount(self,date,debit_amount):
+        try:
+            cur = self.mysql.connection.cursor()
+            cur.execute(GET_BANK_STATEMENT_STATUS_BY_DATE_AND_DEBIT_AMOUNT, (date,debit_amount))
+            self.mysql.connection.commit()
+            bank_statement_status = cur.fetchall()
+            cur.close()
+            return bank_statement_status
+        except Exception as e:
+            print(f"Get All Expense Error : {e}")
+            return ()

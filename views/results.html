@@ -1,18 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Receipt Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment History</title>
 </head>
 <body>
-    <h1>Extracted Receipt Data</h1>
-    <h2>Items:</h2>
-    <ul>
-        {% for item in items %}
-            <li>{{ item }}</li>
-        {% endfor %}
-    </ul>
-    <h2>Total: ${{ total }}</h2>
-    <a href="{{ url_for('dashboard') }}">Upload Another Receipt</a>
+    <div>
+        <h1>Payment History</h1>
+        <ul>
+            {% for transaction in transactions %}
+                <li>
+                    <strong>Date:</strong> {{ transaction.Date }} |
+                    <strong>Description:</strong> {{ transaction.Description }} |
+                    <strong>Debit:</strong> {{ transaction.Debit }} |
+                    <strong>Balance:</strong> {{ transaction.Balance }}
+                    <strong>Status:</strong>
+{% if transaction.Status is not none %}
+            {{ transaction.Status }}  <!-- Accessing the bank_statement key -->
+        {% else %}
+            No bank statement status
+        {% endif %}                </li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>

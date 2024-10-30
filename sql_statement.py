@@ -183,6 +183,7 @@ GET_EXPENSE_GROUP_BY_CATEGORY = (f"SELECT cat.category, COALESCE(SUM(exp.amount)
 GET_USER_BY_USERNAME = f"SELECT * FROM AET_users WHERE username = %s"
 GET_USER_BY_USERNAME_OR_EMAIL = f"SELECT * FROM {USER_TABLE} WHERE username = %s OR email = %s"
 GET_TOTAL_EXPENSES_BY_START_DATE_AND_END_DATE = f"SELECT SUM(amount) AS total_expense FROM AET_expense WHERE date BETWEEN  %s AND  %s "
+GET_BANK_STATEMENT_STATUS_BY_DATE_AND_DEBIT_AMOUNT = "SELECT bank_statement FROM AET_expense WHERE date = %s AND amount = %s LIMIT 1"
 
 #INSERT SCRIPT
 ADD_NEW_USER = f"INSERT INTO AET_users (username, password,first_name,last_name,email,contact_number, company_id, role_id) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)"
@@ -191,6 +192,7 @@ ADD_SINGLE_EXPENSE = f"INSERT INTO {EXPENSE_TABLE} (user_id, company_id, categor
 ADD_COMPANY_DETAILS = f"INSERT INTO AET_company (company_name) VALUES (%s)"
 #UPDATE SCRIPT
 UPDATE_SINGLE_EXPENSE_BY_ID = f"UPDATE {EXPENSE_TABLE} SET vendor = %s, category_id = %s, description = %s, currency_id = %s, amount = %s, date = %s WHERE id = %s;"
+UPDATE_BANK_STATEMENT_MATCHED_STATUS_IN_EXPENSES = f"UPDATE {EXPENSE_TABLE} SET bank_statement = '1' WHERE date = %s AND amount = %s;"
 
 #DELET SCRIPT
 DELETE_SINGLE_EXPENSE_BY_ID = f"DELETE FROM {EXPENSE_TABLE} WHERE id = %s;"
