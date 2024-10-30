@@ -148,6 +148,12 @@ class ExpenseController:
 
         sql += ORDER_BY_DATE + " DESC"
         expenses = self.expenses_model.get_all_expense(sql)
+        # Update bank_statement values
+        for record in expenses:
+            if record['bank_statement'] == 0:
+                record['bank_statement'] = 'unmatched'
+            elif record['bank_statement'] == 1:
+                record['bank_statement'] = 'matched'
 
         if(expenses != ()):
             # Creating a DataFrame
