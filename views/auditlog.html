@@ -66,7 +66,7 @@
         <th>ID</th>
         <th>Type</th>
         <th>User</th>
-        <th>Insert Date</th>
+        <th>Updated Date</th>
         <th>Updated Columns</th>
     </tr>
     {% for expense in auditlogs %}
@@ -89,7 +89,7 @@
         <th>ID</th>
         <th>Type</th>
         <th>User</th>
-        <th>Insert Date</th>
+        <th>{{ search_type | capitalize }} Date</th>
         <th>Expense Date</th>
         <th>Category</th>
         <th>Vendor</th>
