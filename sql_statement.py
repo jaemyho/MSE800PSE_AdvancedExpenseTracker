@@ -164,7 +164,7 @@ GET_DAILY_TOTAL_EXPENSE = (f"SELECT DATE(date) AS day, SUM(amount) AS total_amou
 GET_ALL_EXPENSES = (f"SELECT exp.*, usr.username as user, curr.code as currency, cat.category as category FROM {EXPENSE_TABLE} as exp "
                     f"LEFT JOIN {USER_TABLE} as usr ON exp.user_id = usr.id "
                     f"LEFT JOIN {CURRENCY_TABLE} as curr ON exp.currency_id = curr.id "
-                    f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id WHERE exp.company_id = %s;")
+                    f"LEFT JOIN {CATEGORY_TABLE} as cat ON exp.category_id = cat.id WHERE exp.company_id = %s")
 GET_EXPENSE_BY_ID = f"SELECT * FROM {EXPENSE_TABLE} WHERE id = %s and company_id = %s;"
 GET_ALL_AUDITLOG = f"SELECT al.*, us.username FROM {AUDITLOG_TABLE} as al LEFT JOIN {USER_TABLE} as us on al.user = us.id WHERE al.company_id = %s"
 GET_ALL_CURRENCIES = f"SELECT * FROM {CURRENCY_TABLE};"

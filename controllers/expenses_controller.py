@@ -135,9 +135,6 @@ class ExpenseController:
             start_date = request.form['search_start']
             end_date = request.form['search_end']
 
-            sql = sql[:-1]  # removing character ";" at the end
-            sql += " WHERE 1=1"
-
             if type == "weekly":
                 sql += EXPENSE_FILTER_THIS_WEEK
             elif type == "monthly":
@@ -149,7 +146,7 @@ class ExpenseController:
             if end_date != "":
                 sql += " AND date <= '" + end_date + "'"
 
-            sql += ";"
+        sql += ORDER_BY_DATE + " DESC"
         expenses = self.expenses_model.get_all_expense(sql)
 
         if(expenses != ()):
@@ -162,9 +159,9 @@ class ExpenseController:
 
         data = {
             'expenses' : expenses,
-            'serach_type' : type,
-            'start_date' : start_date,
-            'end_date' : end_date,
+            'search_type' : type,
+            'search_start' : start_date,
+            'search_end' : end_date,
             'grouped_dict_category' : grouped_dict_category
         }
 

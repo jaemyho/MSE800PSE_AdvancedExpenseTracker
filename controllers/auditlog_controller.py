@@ -30,6 +30,7 @@ class AuditlogController:
             end_date = request.form['search_end']
 
         sql = self.auditlog_script_by_filter(sql, type, duration, start_date, end_date)
+        sql += " ORDER by insert_date DESC"
         auditlogs = self.auditlog.get_all_auditlog(sql)
         auditlogs_data = self.log_processing(type, auditlogs)
 
