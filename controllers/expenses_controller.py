@@ -166,7 +166,7 @@ class ExpenseController:
 
         data = {
             'expenses' : expenses,
-            'serach_type' : type,
+            'search_type' : type,
             'search_start' : start_date,
             'search_end' : end_date,
             'grouped_dict_category' : grouped_dict_category
