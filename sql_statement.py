@@ -136,7 +136,7 @@ INSERT INTO `AET_roles` (`role`, `role_description`) VALUES ('Viewer', 'Viewer')
 """
 
 PREINSERT_ADMIN_ACCOUNT = """
-INSERT INTO `AET_users` (`username`, `password`, `company_id`, `role_id`, `first_name`, `last_name`, `email`, `contact_number`) VALUES ('admin', 'abc123', '0', '1', 'Admin', 'Admin', ' ', ' ');
+INSERT INTO `AET_users` (`username`, `password`, `company_id`, `role_id`, `first_name`, `last_name`, `email`, `contact_number`) VALUES ('admin', '$2b$12$A567RWBCv41p/V4r8McuZ.ow2n6us0pbJBPorS.X7uio.vGBHY4py', '0', '1', 'Admin', 'Admin', ' ', ' ');
 """
 
 CREATE_DB = "CREATE DATABASE IF NOT EXISTS"

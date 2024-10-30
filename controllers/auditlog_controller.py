@@ -31,10 +31,17 @@ class AuditlogController:
 
         sql = self.auditlog_script_by_filter(sql, type, duration, start_date, end_date)
         auditlogs = self.auditlog.get_all_auditlog(sql)
-        data = self.log_processing(type, auditlogs)
+        auditlogs_data = self.log_processing(type, auditlogs)
 
-        data = {} if data is None else data
-        return render_template('auditlog.html', auditlogs=data, search_type=type, search_duration=duration, search_start=start_date, search_end=end_date)
+        auditlogs_data = {} if auditlogs_data is None else auditlogs_data
+        data = {
+            'auditlogs': auditlogs_data,
+            'search_type': type,
+            'search_duration': duration,
+            'search_start': start_date,
+            'search_end': end_date,
+        }
+        return render_template('auditlog.html', **data)
 
 
     def auditlog_script_by_filter(self, sql, type, duration, start_date, end_date):

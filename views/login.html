@@ -1,14 +1,7 @@
-<!-- templates/login.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+{% extends 'base.html' %}
+
+{% block content %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container">
         <h2 class="mt-5">Login</h2>
         <form method="POST" action="{{ url_for('login') }}">
             <div class="form-group">
@@ -29,6 +22,5 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-    </div>
-</body>
-</html>
+
+{% endblock %}

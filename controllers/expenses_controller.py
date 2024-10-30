@@ -40,6 +40,9 @@ class ExpenseController:
         total_expense_group_category = self.expenses_model.get_total_expense_group_category(filter_value)
         daily_total_expense_group_by_date = self.expenses_model.get_daily_total_expense(filter_value)
 
+        for x in daily_total_expense_group_by_date:
+            x['day'] = x['day'].strftime('%Y-%m-%d')
+
         max_expense_record = {
             'amount': 0,
             'category': "None"
